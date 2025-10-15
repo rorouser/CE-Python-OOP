@@ -16,3 +16,9 @@ y = 10
 print(x is not y)
 
 print(MiClase.__doc__)
+
+booleano = False
+print(int(booleano))
+
+integer = 0
+print(bool(integer))
