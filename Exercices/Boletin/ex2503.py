@@ -6,7 +6,6 @@ def opera2(operador, apodo='', nombre='', fecha=datetime):
     if operador == '1':
         club[apodo] = [nombre, datetime.now().strftime('%d/%m/%Y %H:%M:%S')]
         print(f'Socio {apodo} dado de alta.')
-
     elif operador == '2':
         if apodo in club:
             club.pop(apodo)
@@ -31,16 +30,13 @@ def opera2(operador, apodo='', nombre='', fecha=datetime):
         print('Opción no válida.')
     return True
 
-
 a = True
 while a:
     op = input('''\n1. Alta socio.\n2. Baja socio.\n3. Modificación socio.\n4. Listar socios por apodo.\n5. Listar socios por antigüedad.\n6. Listar los socios con alta anterior a 2025.\n7. Salir\n> ''')
-
     if op in ('1', '2', '3'):
         apodo = input('Dime tu apodo: ')
         nombre = input('Dime tu nombre: ')
     else:
         apodo = ''
         nombre = ''
-
     a = opera2(op, apodo, nombre)
