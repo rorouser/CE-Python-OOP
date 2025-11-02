@@ -1,0 +1,11 @@
+[
+  {
+  "id": 1,
+  "descripcion": "Estudiar Python",
+  "prioridad": "alta",
+  "completada": false,
+  "categoria": {
+    "principal": "estudios",
+    "sub": "programacion"}
+  }
+]
