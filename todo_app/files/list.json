@@ -7,5 +7,23 @@
   "categoria": {
     "principal": "estudios",
     "sub": "programacion"}
+  },
+  {
+  "id": 2,
+  "descripcion": "Estudiar Git",
+  "prioridad": "media",
+  "completada": false,
+  "categoria": {
+    "principal": "estudios",
+    "sub": "entornos"}
+  },
+  {
+  "id": 3,
+  "descripcion": "Estudiar SQL",
+  "prioridad": "baja",
+  "completada": true,
+  "categoria": {
+    "principal": "estudios",
+    "sub": "base de datos"}
   }
 ]
