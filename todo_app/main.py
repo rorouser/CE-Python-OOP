@@ -62,11 +62,11 @@ def main():
 
                                         case "2":
                                             # 2 - Listar tareas completadas
-                                            utils.mostrar_tareas([t for t in tareas if t["completada"]])
+                                            utils.mostrar_tareas([t for t in tareas if t.completada])
 
                                         case "3":
                                             # 3 - Listar tareas pendientes
-                                            utils.mostrar_tareas([t for t in tareas if not t["completada"]])
+                                            utils.mostrar_tareas([t for t in tareas if not t.completada])
 
                                         case _:
                                             print("Opción no válida, intenta de nuevo.")
@@ -78,18 +78,18 @@ def main():
                             # 2 - Agregar una tarea
                             try:
                                 descripcion = input("Descripción: ")
-                                opciones = [p.value for p in Prioridad]
-                                print(f"Opciones de prioridad: {', '.join(o.capitalize() for o in opciones)}")
-                                prioridad = input("Prioridad: ")
+                                prioridad = pedir_prioridad()
                                 categoria = input("Categoria: ")
                                 subcategoria = input("Subcategoria: ")
-                                tareas.append(Tarea(
-                                            id = max([t["id"] for t in tareas], default=0) + 1,
+                                tarea = Tarea(
+                                            id = max([t.id for t in tareas], default=0) + 1,
                                             descripcion = descripcion,
                                             prioridad = prioridad,
                                             completada = False,
                                             categoria = Categoria(principal = categoria,
-                                                                  sub = subcategoria)))
+                                                                  sub = subcategoria))
+                                print(tarea)
+                                tareas.append(tarea)
                                 print("Tarea creada con exito.")
                             except Exception as e:
                                 print(f"Error al insertar documentos: {e}")
@@ -97,10 +97,80 @@ def main():
                         case "3":
                             # 3 - Editar una tarea
                             try:
-                                pass
+                                continuar_submenu_editar = True
+                                while continuar_submenu_editar:
+                                    utils.mostrarMenu(4)
+                                    opcion_editar_tareas = input("Seleccione una opción: ")
+                                    match opcion_editar_tareas:
+                                        case "0":
+                                            # 0 - Volver
+                                            continuar_submenu_editar = False
+
+                                        case "1":
+                                            # 1 - Listar tareas
+                                            utils.mostrar_tareas(tareas)
+
+                                        case "2":
+                                            # 2 - Editar tarea
+                                            id = input("Id de la tarea: ")
+                                            tarea = [t for t in tareas if t.id==int(id)][0]
+                                            utils.mostrar_tareas([tarea])
+                                            try:
+                                                continuar_editar = True
+                                                while continuar_editar:
+                                                    utils.mostrarMenu(5)
+                                                    opcion_editar = input("Seleccione una opción: ")
+                                                    match opcion_editar:
+                                                        case "0":
+                                                            # 0 - Volver
+                                                            continuar_editar = False
+
+                                                        case "1":
+                                                            # 1 - Editar descripcion
+                                                            print('Descripción actual: ', tarea.descripcion)
+                                                            descripcion = input("Nueva descripcion: ")
+                                                            tarea.descripcion = descripcion
+                                                            print('Descripción cambiada correctamente: ', tarea.descripcion)
+
+                                                        case "2":
+                                                            # 2 - Editar prioridad
+                                                            print('Prioridad actual: ', tarea.prioridad)
+                                                            prioridad = pedir_prioridad()
+                                                            tarea.prioridad = prioridad
+                                                            print('Prioridad cambiada correctamente: ', tarea.prioridad)
+
+                                                        case "3":
+                                                            # 3 - Editar categoria
+                                                            print('Categoria actual: ', tarea.categoria)
+                                                            categoria = input("Nueva categoria: ")
+                                                            tarea.categoria = categoria
+                                                            print('Categoria cambiada correctamente: ', tarea.categoria)
+
+                                                        case "4":
+                                                            # 4 - Editar subcategoria
+                                                            print('Subcategoria actual: ', tarea.subcategoria)
+                                                            subcategoria = input("Nueva subcategoria: ")
+                                                            tarea.subcategoria = subcategoria
+                                                            print('Subcategoria cambiada correctamente: ', tarea.subcategoria)
+
+                                                        case "5":
+                                                            # 5 - Guardar
+                                                            tareas.pop(tarea.id)
+                                                            tareas.append(tarea)
+                                                            print('Tarea guardada correctamente: \n', tarea)
+                                                            continuar_editar = False
+
+                                                        case _:
+                                                            print("Opción no válida, intenta de nuevo.")
+
+                                            except Exception as e:
+                                                print(f"Error al editar tarea: {e}")
+
+                                        case _:
+                                            print("Opción no válida, intenta de nuevo.")
 
                             except Exception as e:
-                                print(f"Error al recuperar documentos: {e}")
+                                print(f"Error al editar tarea: {e}")
 
                         case "4":
                             # 4 - Eliminar una tarea
@@ -118,7 +188,7 @@ def main():
                                 utils.mostrar_tareas(resultados)
 
                             except Exception as e:
-                                print(f"Error al recuperar documentos: {e}")
+                                print(f"Error al guardar documentos: {e}")
 
                         case "6":
                             # 6 - Marcar como completada
@@ -162,14 +232,14 @@ def main():
 def pedir_prioridad():
     # 🔹 Mostrar las prioridades disponibles
     opciones = [p.value for p in Prioridad]  # ["alta", "media", "baja"]
-    print(f" Opciones de prioridad: {', '.join(o.capitalize() for o in opciones)}")
+    print(f"Opciones de prioridad: {', '.join(o.capitalize() for o in opciones)}")
 
     # 🔹 Pedir al usuario hasta que elija una válida
     while True:
-        entrada = input(" Prioridad: ").strip().lower()
+        entrada = input("Prioridad: ").strip().lower()
         if entrada in opciones:
             return Prioridad(entrada)
-        print(" Opción no válida. Intenta de nuevo.")
+        print("Opción no válida. Intenta de nuevo.")
 
 if __name__ == "__main__":
     main()

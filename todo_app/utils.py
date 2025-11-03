@@ -4,14 +4,7 @@ def mostrar_tareas(lista):
         return
 
     for t in lista:
-        estado = "Completada" if t["completada"] else "Pendiente"
-        print(f"""
-   ID: {t["id"]}
-   Descripción: {t["descripcion"]}
-   Prioridad: {t["prioridad"].capitalize()}
-   Categoría: {t["categoria"]["principal"]} / {t["categoria"]["sub"]}
-   Estado: {estado}
-        """)
+        print(t)
 
 def mostrarMenu(menu = 0, tareas_cargadas = True):
     match menu:
@@ -38,6 +31,17 @@ def mostrarMenu(menu = 0, tareas_cargadas = True):
             print("         1 - Listar todas las tareas")
             print("         2 - Listar tareas completadas")
             print("         3 - Listar tareas pendientes")
+        case 4:
+            print("         0 - Volver")
+            print("         1 - Listar tareas")
+            print("         2 - Editar tarea")
+        case 5:
+            print("             0 - Volver")
+            print("             1 - Editar descripcion")
+            print("             2 - Editar prioridad")
+            print("             3 - Editar categoria")
+            print("             4 - Editar subcategoria")
+            print("             5 - Guardar")
 
 
 def buscar_por_categoria(estructura, categoria, tarea=None):
