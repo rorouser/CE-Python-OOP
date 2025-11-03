@@ -96,8 +96,9 @@ def main():
                                             continuar_submenu_busqueda = False
 
                                         case "1":
-                                            pass
-
+                                            categoria = input("Escriba la categoría: ")
+                                            resultados = utils.buscar_categoria_recursiva(tareas, categoria)
+                                            utils.mostrar_tareas(resultados)
                                         case "2":
                                             pass
 
