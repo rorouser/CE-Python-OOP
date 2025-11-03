@@ -113,9 +113,9 @@ def main():
                                         case "2":
                                             # 2 - Editar tarea
                                             id = input("Id de la tarea: ")
-                                            tarea = [t for t in tareas if t.id==int(id)][0]
-                                            utils.mostrar_tareas([tarea])
                                             try:
+                                                tarea = [t for t in tareas if t.id == int(id)][0]
+                                                utils.mostrar_tareas([tarea])
                                                 continuar_editar = True
                                                 while continuar_editar:
                                                     utils.mostrarMenu(5)
@@ -143,28 +143,21 @@ def main():
                                                             # 3 - Editar categoria
                                                             print('Categoria actual: ', tarea.categoria)
                                                             categoria = input("Nueva categoria: ")
-                                                            tarea.categoria = categoria
+                                                            tarea.categoria.principal = categoria
                                                             print('Categoria cambiada correctamente: ', tarea.categoria)
 
                                                         case "4":
                                                             # 4 - Editar subcategoria
-                                                            print('Subcategoria actual: ', tarea.subcategoria)
+                                                            print('Subcategoria actual: ', tarea.categoria)
                                                             subcategoria = input("Nueva subcategoria: ")
-                                                            tarea.subcategoria = subcategoria
-                                                            print('Subcategoria cambiada correctamente: ', tarea.subcategoria)
-
-                                                        case "5":
-                                                            # 5 - Guardar
-                                                            tareas.pop(tarea.id)
-                                                            tareas.append(tarea)
-                                                            print('Tarea guardada correctamente: \n', tarea)
-                                                            continuar_editar = False
+                                                            tarea.categoria.sub = subcategoria
+                                                            print('Subcategoria cambiada correctamente: ', tarea.categoria.sub)
 
                                                         case _:
                                                             print("Opción no válida, intenta de nuevo.")
 
-                                            except Exception as e:
-                                                print(f"Error al editar tarea: {e}")
+                                            except IndexError:
+                                                print(f"No se encontró ninguna tarea con ID {id}.")
 
                                         case _:
                                             print("Opción no válida, intenta de nuevo.")
@@ -193,7 +186,32 @@ def main():
                         case "6":
                             # 6 - Marcar como completada
                             try:
-                                pass
+                                continuar_completada = True
+                                while continuar_completada:
+                                    utils.mostrarMenu(6)
+                                    opcion_editar_tareas = input("Seleccione una opción: ")
+                                    match opcion_editar_tareas:
+                                        case "0":
+                                            # 0 - Volver
+                                            continuar_completada = False
+
+                                        case "1":
+                                            # 1 - Listar tareas
+                                            utils.mostrar_tareas([t for t in tareas if not t.completada])
+
+                                        case "2":
+                                            # 2 - Marcar como completada
+                                            id = input("Id de la tarea: ")
+                                            try:
+                                                tarea = [t for t in tareas if t.id == int(id)][0]
+                                                if tarea.completada:
+                                                    print('Tarea ya completada, no se puede volver a completar.')
+                                                else:
+                                                    tarea.completada = True
+                                                utils.mostrar_tareas([tarea])
+
+                                            except IndexError:
+                                                print(f"No se encontró ninguna tarea con ID {id}.")
 
                             except Exception as e:
                                 print(f"Error al recuperar documentos: {e}")

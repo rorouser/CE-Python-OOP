@@ -41,7 +41,10 @@ def mostrarMenu(menu = 0, tareas_cargadas = True):
             print("             2 - Editar prioridad")
             print("             3 - Editar categoria")
             print("             4 - Editar subcategoria")
-            print("             5 - Guardar")
+        case 6:
+            print("         0 - Volver")
+            print("         1 - Listar tareas pendientes")
+            print("         2 - Marcar como completada")
 
 
 def buscar_por_categoria(estructura, categoria, tarea=None):

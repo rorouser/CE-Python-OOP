@@ -3,7 +3,7 @@
         "id": 1,
         "descripcion": "Estudiar Python Macaco",
         "prioridad": "alta",
-        "completada": false,
+        "completada": true,
         "categoria": {
             "principal": "estudios",
             "sub": "programacion"
@@ -27,6 +27,16 @@
         "categoria": {
             "principal": "cat",
             "sub": "sub"
+        }
+    },
+    {
+        "id": 5,
+        "descripcion": "Tarea de python",
+        "prioridad": "alta",
+        "completada": false,
+        "categoria": {
+            "principal": "programacion",
+            "sub": "ejercicios practicos"
         }
     }
 ]
