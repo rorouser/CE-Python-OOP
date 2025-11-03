@@ -22,6 +22,13 @@ def cargar_lista_json():
     except json.JSONDecodeError as e:
         raise ValueError(f"Error al decodificar JSON: {e}") from e
 
-def escribir_lista_json():
-    with open('files/list.json', 'w', encoding='utf-8') as f:
-        json.dump(cargar_lista_json(), f)
+def guardar_lista_json(tareas):
+    '''
+    Función para cargar la lista de tareas en el fichero de tareas json
+    '''
+    try:
+        with open('files/list.json', 'w', encoding='utf-8') as f:
+            json.dump(tareas, f)
+
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Error al decodificar JSON: {e}") from e
