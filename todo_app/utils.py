@@ -1,3 +1,8 @@
+from entities import Tarea, Categoria
+
+def buscar_tareas(tareas, id):
+    return [t for t in tareas if t.id == int(id)][0]
+
 def mostrar_tareas(lista):
     if not lista:
         print("No hay tareas para mostrar.")
@@ -47,42 +52,33 @@ def mostrarMenu(menu = 0, tareas_cargadas = True):
             print("         2 - Marcar como completada")
 
 
-def buscar_por_categoria(estructura, categoria, tarea=None):
+def buscar_por_categoria(estructura, categoria_buscada, tarea=None):
     """
-    Busca recursivamente 'categoria' dentro de 'estructura'.
-    Devuelve SIEMPRE una lista de tareas (diccionarios completos) que coinciden.
-    'tarea' es el diccionario de la tarea actual (si se está procesando una tarea).
+    Busca recursivamente una categoría dentro de una estructura compuesta por objetos Tarea y Categoria.
+    Devuelve una lista con las tareas (objetos Tarea) que coinciden con la categoría buscada.
     """
     resultados = []
 
-    # Si es una lista, llamamos recursivamente sobre cada elemento (manteniendo tarea)
+    # 🧩 Caso 1: si es lista, recorremos cada elemento recursivamente
     if isinstance(estructura, list):
         if not estructura:
             return []
-        # primera posición + resto (recursivo)
-        return (buscar_por_categoria(estructura[0], categoria, tarea)
-                + buscar_por_categoria(estructura[1:], categoria, tarea))
+        return (
+            buscar_por_categoria(estructura[0], categoria_buscada, tarea)
+            + buscar_por_categoria(estructura[1:], categoria_buscada, tarea)
+        )
 
-    # Si es un diccionario
-    if isinstance(estructura, dict):
-        # Si este diccionario parece una tarea (tiene 'id' o 'descripcion'), lo tomamos como nuevo tarea
-        if 'id' in estructura:
-            tarea = estructura
+    if isinstance(estructura, Tarea):
+        tarea = estructura
+        return buscar_por_categoria(estructura.categoria, categoria_buscada, tarea)
 
-        # Recorremos sus valores y llamamos recursivamente
-        for valor in estructura.values():
-            # Si el valor es otra estructura, buscamos dentro (pasando el tarea actual)
-            if isinstance(valor, (list, dict)):
-                resultados += buscar_por_categoria(valor, categoria, tarea)
-            else:
-                # Si el valor es un valor simple y coincide con la categoría buscada
-                if valor == categoria and tarea is not None:
-                    # añadimos la tarea completa (contexto) si aún no está añadida
-                    if tarea not in resultados:
-                        resultados.append(tarea)
-
+    if isinstance(estructura, Categoria):
+        # buscamos coincidencias directas
+        for campo in ["principal", "sub"]:
+            valor = getattr(estructura, campo, None)
+            if valor == categoria_buscada and tarea is not None:
+                resultados.append(tarea)
         return resultados
 
-    # Si es cualquier otro tipo (p. ej. str, int) y no un dict/list, no hay coincidencia
+    # 🧩 Caso 4: cualquier otro tipo → nada que buscar
     return []
-

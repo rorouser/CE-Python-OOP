@@ -9,13 +9,27 @@ def main():
     continuar = True
     tareas = []
     tareas_cargadas = False
+    guardado = False
     while continuar:
         utils.mostrarMenu(tareas_cargadas=tareas_cargadas)
         opcion = input("Seleccione una opción: ")
         match opcion:
             case "0":
                 # 0 - Salir de la aplicacion
-                continuar = False
+                if not guardado:
+                    salir = True
+                    while salir:
+                        opcion_guardado = input("¿Seguro que quiere salir sin guardar? S/N: ")
+                        match opcion_guardado:
+                            case "S":
+                                continuar = False
+                                salir = False
+                            case "N":
+                                salir = False
+                            case _:
+                                print("Opción no válida, intenta de nuevo.")
+                else:
+                    continuar = False
 
             case "1":
                 # 1 - Cargar tareas
@@ -114,7 +128,7 @@ def main():
                                             # 2 - Editar tarea
                                             id = input("Id de la tarea: ")
                                             try:
-                                                tarea = [t for t in tareas if t.id == int(id)][0]
+                                                tarea = utils.buscar_tareas(tareas, id)
                                                 utils.mostrar_tareas([tarea])
                                                 continuar_editar = True
                                                 while continuar_editar:
@@ -168,8 +182,10 @@ def main():
                         case "4":
                             # 4 - Eliminar una tarea
                             try:
-                                pass
-
+                                id = input("Id de la tarea: ")
+                                tarea = utils.buscar_tareas(tareas, id)
+                                tareas.remove(tarea)
+                                print("Tarea borrada con exito.")
                             except Exception as e:
                                 print(f"Error al recuperar documentos: {e}")
 
@@ -203,7 +219,7 @@ def main():
                                             # 2 - Marcar como completada
                                             id = input("Id de la tarea: ")
                                             try:
-                                                tarea = [t for t in tareas if t.id == int(id)][0]
+                                                tarea = utils.buscar_tareas(tareas, id)
                                                 if tarea.completada:
                                                     print('Tarea ya completada, no se puede volver a completar.')
                                                 else:
@@ -224,6 +240,7 @@ def main():
                 try:
                     data_handler.guardar_lista_json(tareas)
                     print("Tareas guardadas correctamente")
+                    guardado = True
 
                 except Exception as e:
                     print(f"Error al recuperar documentos: {e}")
@@ -242,7 +259,6 @@ def main():
 
                 except Exception as e:
                     print(f"Error al recuperar documentos: {e}")
-
 
             case _:
                 print("Opción no válida, intenta de nuevo.")
