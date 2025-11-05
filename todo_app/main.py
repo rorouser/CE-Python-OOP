@@ -1,8 +1,6 @@
-from datetime import datetime, timezone
-from unittest import case
 import utils
 import data_handler
-from entities import Tarea, Categoria, Prioridad
+from entities import *
 
 # Función del programa principal
 def main():
@@ -20,7 +18,7 @@ def main():
                     salir = True
                     while salir:
                         opcion_guardado = input("¿Seguro que quiere salir sin guardar? S/N: ")
-                        match opcion_guardado:
+                        match opcion_guardado.upper():
                             case "S":
                                 continuar = False
                                 salir = False
@@ -94,8 +92,8 @@ def main():
                                 try:
                                     descripcion = input("Descripción: ")
                                     prioridad = pedir_prioridad()
-                                    categoria = input("Categoria: ")
-                                    subcategoria = input("Subcategoria: ")
+                                    categoria = pedir_categoria()
+                                    subcategoria = pedir_subcategoria(categoria)
                                     tarea = Tarea(
                                                 id = max([t.id for t in tareas], default=0) + 1,
                                                 descripcion = descripcion,
@@ -160,17 +158,19 @@ def main():
                                                             case "3":
                                                                 # 3 - Editar categoria
                                                                 print('Categoria actual: ', tarea.categoria)
-                                                                categoria = input("Nueva categoria: ")
+                                                                categoria = pedir_categoria()
+                                                                subcategoria = pedir_subcategoria(categoria)
                                                                 tarea.categoria.principal = categoria
+                                                                tarea.categoria.sub = subcategoria
                                                                 print('Categoria cambiada correctamente: ', tarea.categoria)
                                                                 guardado = False
 
                                                             case "4":
                                                                 # 4 - Editar subcategoria
                                                                 print('Subcategoria actual: ', tarea.categoria)
-                                                                subcategoria = input("Nueva subcategoria: ")
+                                                                subcategoria = pedir_subcategoria(tarea.categoria.principal)
                                                                 tarea.categoria.sub = subcategoria
-                                                                print('Subcategoria cambiada correctamente: ', tarea.categoria.sub)
+                                                                print('Subcategoria cambiada correctamente: ', tarea.categoria)
                                                                 guardado = False
 
                                                             case _:
@@ -189,18 +189,28 @@ def main():
                                 # 4 - Eliminar una tarea
                                 try:
                                     id = input("Id de la tarea: ")
-                                    tarea = utils.buscar_tareas(tareas, id)
-                                    tareas.remove(tarea)
-                                    print("Tarea borrada con exito.")
-                                    guardado = False
+                                    no_borrar = True
+                                    while no_borrar:
+                                        guardar_tarea = input("¿Seguro que quiere salir sin guardar? S/N: ")
+                                        match guardar_tarea.upper():
+                                            case "S":
+                                                tarea = utils.buscar_tareas(tareas, id)
+                                                tareas.remove(tarea)
+                                                print("Tarea borrada con exito.")
+                                                guardado = False
+                                                no_borrar = False
+                                            case "N":
+                                                no_borrar = False
+                                            case _:
+                                                print("Opción no válida, intenta de nuevo.")
                                 except Exception as e:
-                                    print(f"Error al recuperar documentos: {e}")
+                                    print(f"Error al eliminar la tarea: {e}")
 
                             case "5":
                                 # 5 - Buscar una tarea por categoría o palabra clave
                                 try:
                                     categoria = input("Escriba la categoría o palabra clave: ")
-                                    resultados = utils.buscar_por_categoria(tareas, categoria)
+                                    resultados = utils.buscar_por_categoria(tareas, categoria.lower().capitalize())
                                     utils.mostrar_tareas(resultados)
 
                                 except Exception as e:
@@ -257,7 +267,7 @@ def main():
                             print("No hay tareas para guardar")
 
                     except Exception as e:
-                        print(f"Error al recuperar documentos: {e}")
+                        print(f"Error al guardar los documentos: {e}")
                 else:
                     print("Opción no válida, intenta de nuevo.")
 
@@ -283,16 +293,48 @@ def main():
                 print("Opción no válida, intenta de nuevo.")
 
 def pedir_prioridad():
-    # Mostrar las prioridades disponibles
-    opciones = [p.value for p in Prioridad]  # ["alta", "media", "baja"]
+    opciones = [p.value for p in Prioridad]
     print(f"Opciones de prioridad: {', '.join(o.capitalize() for o in opciones)}")
 
     # Pedir al usuario hasta que elija una válida
     while True:
-        entrada = input("Prioridad: ").strip().lower()
+        entrada = input("Prioridad: ").strip().capitalize()
         if entrada in opciones:
             return Prioridad(entrada)
         print("Opción no válida. Intenta de nuevo.")
+
+def pedir_categoria():
+    """Pide al usuario que elija una categoría principal válida."""
+    opciones = [c.value for c in CategoriaPrincipal]
+    print(f"Opciones de categoría: {', '.join(opciones)}")
+
+    while True:
+        entrada = input("Categoría: ").strip().capitalize()
+        for cat in CategoriaPrincipal:
+            if cat.value.lower() == entrada.lower():
+                return cat
+        print("Categoría no válida. Intenta de nuevo.")
+
+
+def pedir_subcategoria(categoria_principal):
+    """
+    Pide una subcategoría válida según la categoría principal seleccionada.
+    Recibe un valor de CategoriaPrincipal.
+    """
+    sub_enum_cls = SUBCATEGORIAS_POR_CATEGORIA.get(categoria_principal)
+    if not sub_enum_cls:
+        print(f"No hay subcategorías definidas para {categoria_principal.value}.")
+        return None
+
+    opciones = [s.value for s in sub_enum_cls]
+    print(f"Opciones de subcategoría para {categoria_principal.value}: {', '.join(opciones)}")
+
+    while True:
+        entrada = input("Subcategoría: ").strip().capitalize()
+        for sub in sub_enum_cls:
+            if sub.value.lower() == entrada.lower():
+                return sub
+        print("Subcategoría no válida. Intenta de nuevo.")
 
 if __name__ == "__main__":
     main()

@@ -2,41 +2,51 @@
     {
         "id": 1,
         "descripcion": "Estudiar Python Macaco",
-        "prioridad": "alta",
+        "prioridad": "Alta",
         "completada": true,
         "categoria": {
-            "principal": "estudios",
-            "sub": "programacion"
+            "principal": "Estudio",
+            "sub": "Examenes"
         }
     },
     {
         "id": 3,
         "descripcion": "Estudiar SQL",
-        "prioridad": "baja",
+        "prioridad": "Baja",
         "completada": true,
         "categoria": {
-            "principal": "estudios",
-            "sub": "base de datos"
+            "principal": "Estudio",
+            "sub": "Tareas"
         }
     },
     {
         "id": 4,
         "descripcion": "desc",
-        "prioridad": "alta",
+        "prioridad": "Alta",
         "completada": false,
         "categoria": {
-            "principal": "cat",
-            "sub": "sub"
+            "principal": "Personal",
+            "sub": "Finanzas"
         }
     },
     {
         "id": 5,
         "descripcion": "Tarea de python",
-        "prioridad": "alta",
+        "prioridad": "Alta",
         "completada": false,
         "categoria": {
-            "principal": "programacion",
-            "sub": "ejercicios practicos"
+            "principal": "Estudio",
+            "sub": "Tareas"
+        }
+    },
+    {
+        "id": 6,
+        "descripcion": "Tarea de BBDD",
+        "prioridad": "Alta",
+        "completada": false,
+        "categoria": {
+            "principal": "Trabajo",
+            "sub": "Reuniones"
         }
     }
 ]

@@ -1,4 +1,4 @@
-from entities import Tarea, Categoria
+from entities import *
 
 def buscar_tareas(tareas, id):
     return [t for t in tareas if t.id == int(id)][0]
@@ -54,12 +54,13 @@ def mostrarMenu(menu = 0, tareas_cargadas = True):
 
 def buscar_por_categoria(estructura, categoria_buscada, tarea=None):
     """
-    Busca recursivamente una categoría dentro de una estructura compuesta por objetos Tarea y Categoria.
-    Devuelve una lista con las tareas (objetos Tarea) que coinciden con la categoría buscada.
+    Busca recursivamente tareas que coincidan con una prioridad, categoría principal o subcategoría.
+    El parámetro `categoria_buscada` puede ser un string o un Enum.
+    Devuelve una lista con las tareas que cumplan el criterio.
     """
     resultados = []
 
-    # 🧩 Caso 1: si es lista, recorremos cada elemento recursivamente
+    # 🧩 Caso 1: si es lista → recorrer recursivamente
     if isinstance(estructura, list):
         if not estructura:
             return []
@@ -68,17 +69,48 @@ def buscar_por_categoria(estructura, categoria_buscada, tarea=None):
             + buscar_por_categoria(estructura[1:], categoria_buscada, tarea)
         )
 
+    # 🧩 Caso 2: si es una tarea
     if isinstance(estructura, Tarea):
         tarea = estructura
-        return buscar_por_categoria(estructura.categoria, categoria_buscada, tarea)
 
-    if isinstance(estructura, Categoria):
-        # buscamos coincidencias directas
-        for campo in ["principal", "sub"]:
-            valor = getattr(estructura, campo, None)
-            if valor == categoria_buscada and tarea is not None:
-                resultados.append(tarea)
+        # --- Normalizamos la búsqueda si es string ---
+        busqueda = categoria_buscada.strip().lower() if isinstance(categoria_buscada, str) else categoria_buscada
+
+        # --- Buscar coincidencia por prioridad ---
+        if (
+            (isinstance(busqueda, Prioridad) and tarea.prioridad == busqueda)
+            or (isinstance(busqueda, str) and tarea.prioridad.value == busqueda)
+        ):
+            resultados.append(tarea)
+
+        # --- Buscar en la categoría ---
+        resultados += buscar_por_categoria(estructura.categoria, categoria_buscada, tarea)
         return resultados
 
-    # 🧩 Caso 4: cualquier otro tipo → nada que buscar
+    # 🧩 Caso 3: si es una categoría
+    if isinstance(estructura, Categoria):
+        cat = estructura
+        busqueda = categoria_buscada.strip().lower() if isinstance(categoria_buscada, str) else categoria_buscada
+
+        # --- Si la búsqueda es un Enum de categoría principal ---
+        if isinstance(busqueda, CategoriaPrincipal) and cat.principal == busqueda:
+            resultados.append(tarea)
+
+        # --- Si es un Enum de subcategoría ---
+        elif any(isinstance(busqueda, sub_enum) for sub_enum in SUBCATEGORIAS_POR_CATEGORIA.values()):
+            if cat.sub == busqueda:
+                resultados.append(tarea)
+
+        # --- Si es texto: comparar con nombres de categoría o subcategoría ---
+        elif isinstance(busqueda, str):
+            if (
+                cat.principal.value.lower() == busqueda
+                or cat.sub.value.lower() == busqueda
+            ):
+                resultados.append(tarea)
+
+        return resultados
+
+    # 🧩 Caso 4: otro tipo → nada que buscar
     return []
+
