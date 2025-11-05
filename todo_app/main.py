@@ -210,7 +210,7 @@ def main():
                                 # 5 - Buscar una tarea por categoría o palabra clave
                                 try:
                                     categoria = input("Escriba la categoría o palabra clave: ")
-                                    resultados = utils.buscar_por_categoria(tareas, categoria.lower().capitalize())
+                                    resultados = utils.buscar_por_palabra_clave(tareas, categoria.lower().capitalize())
                                     utils.mostrar_tareas(resultados)
 
                                 except Exception as e:

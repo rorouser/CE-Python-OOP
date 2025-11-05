@@ -29,7 +29,7 @@ def mostrarMenu(menu = 0, tareas_cargadas = True):
             print("     2 - Agregar una tarea")
             print("     3 - Editar una tarea")
             print("     4 - Eliminar una tarea")
-            print("     5 - Buscar una tarea por categoría o palabra clave")
+            print("     5 - Buscar una tarea por palabra clave")
             print("     6 - Marcar como completada")
         case 3:
             print("         0 - Volver")
@@ -52,9 +52,10 @@ def mostrarMenu(menu = 0, tareas_cargadas = True):
             print("         2 - Marcar como completada")
 
 
-def buscar_por_categoria(estructura, categoria_buscada, tarea=None):
+def buscar_por_palabra_clave(estructura, categoria_buscada, tarea=None):
     """
-    Busca recursivamente tareas que coincidan con una prioridad, categoría principal o subcategoría.
+    Busca recursivamente tareas que coincidan con una prioridad, categoría principal,
+    subcategoría o palabras sueltas dentro de la descripción.
     El parámetro `categoria_buscada` puede ser un string o un Enum.
     Devuelve una lista con las tareas que cumplan el criterio.
     """
@@ -65,26 +66,30 @@ def buscar_por_categoria(estructura, categoria_buscada, tarea=None):
         if not estructura:
             return []
         return (
-            buscar_por_categoria(estructura[0], categoria_buscada, tarea)
-            + buscar_por_categoria(estructura[1:], categoria_buscada, tarea)
+            buscar_por_palabra_clave(estructura[0], categoria_buscada, tarea)
+            + buscar_por_palabra_clave(estructura[1:], categoria_buscada, tarea)
         )
 
     # 🧩 Caso 2: si es una tarea
     if isinstance(estructura, Tarea):
         tarea = estructura
 
-        # --- Normalizamos la búsqueda si es string ---
+        # Normalizamos la búsqueda
         busqueda = categoria_buscada.strip().lower() if isinstance(categoria_buscada, str) else categoria_buscada
 
         # --- Buscar coincidencia por prioridad ---
         if (
             (isinstance(busqueda, Prioridad) and tarea.prioridad == busqueda)
-            or (isinstance(busqueda, str) and tarea.prioridad.value == busqueda)
+            or (isinstance(busqueda, str) and busqueda in tarea.prioridad.value.lower())
         ):
             resultados.append(tarea)
 
-        # --- Buscar en la categoría ---
-        resultados += buscar_por_categoria(estructura.categoria, categoria_buscada, tarea)
+        # --- Buscar coincidencias en la descripción ---
+        if isinstance(busqueda, str) and busqueda in tarea.descripcion.lower():
+            resultados.append(tarea)
+
+        # --- Buscar coincidencias en la categoría ---
+        resultados += buscar_por_palabra_clave(estructura.categoria, categoria_buscada, tarea)
         return resultados
 
     # 🧩 Caso 3: si es una categoría
@@ -101,11 +106,11 @@ def buscar_por_categoria(estructura, categoria_buscada, tarea=None):
             if cat.sub == busqueda:
                 resultados.append(tarea)
 
-        # --- Si es texto: comparar con nombres de categoría o subcategoría ---
+        # --- Si es texto: coincidencias parciales (no exactas) ---
         elif isinstance(busqueda, str):
             if (
-                cat.principal.value.lower() == busqueda
-                or cat.sub.value.lower() == busqueda
+                busqueda in cat.principal.value.lower()
+                or busqueda in cat.sub.value.lower()
             ):
                 resultados.append(tarea)
 
@@ -113,4 +118,3 @@ def buscar_por_categoria(estructura, categoria_buscada, tarea=None):
 
     # 🧩 Caso 4: otro tipo → nada que buscar
     return []
-

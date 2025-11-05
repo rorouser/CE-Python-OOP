@@ -10,7 +10,6 @@ class CategoriaPrincipal(Enum):
     TRABAJO = "Trabajo"
     PERSONAL = "Personal"
     ESTUDIO = "Estudio"
-    OTROS = "Otros"
 
 class Subcategoria(Enum):
     pass

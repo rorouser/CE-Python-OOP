@@ -48,5 +48,15 @@
             "principal": "Trabajo",
             "sub": "Reuniones"
         }
+    },
+    {
+        "id": 7,
+        "descripcion": "Llamada con RRHH",
+        "prioridad": "Alta",
+        "completada": false,
+        "categoria": {
+            "principal": "Trabajo",
+            "sub": "Reuniones"
+        }
     }
 ]
