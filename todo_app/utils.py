@@ -29,7 +29,7 @@ def mostrarMenu(menu = 0, tareas_cargadas = True):
             print("     2 - Agregar una tarea")
             print("     3 - Editar una tarea")
             print("     4 - Eliminar una tarea")
-            print("     5 - Buscar una tarea por palabra clave")
+            print("     5 - Buscar tareas por palabra clave")
             print("     6 - Marcar como completada")
         case 3:
             print("         0 - Volver")
