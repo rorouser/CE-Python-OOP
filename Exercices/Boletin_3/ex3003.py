@@ -1,6 +1,6 @@
 class Nota:
-    nombre_estudiante = str
-    nota = int
+    nombre_estudiante: str
+    nota: int
 
     def __init__(self, nota, nombre_estudiante):
         self.nota = nota

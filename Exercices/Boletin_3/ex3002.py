@@ -1,7 +1,7 @@
 class Libro:
-    titulo = str
-    nombre_autor = str
-    precio = float
+    titulo: str
+    nombre_autor: str
+    precio: float
 
     def __init__(self, titulo, nombre_autor, precio):
         self.titulo = titulo
