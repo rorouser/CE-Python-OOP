@@ -12,8 +12,9 @@ class Nota:
         else:
             print(f"\nEl alumno: {self.nombre_estudiante} ha suspendido con un {self.nota}")
 
-nota = Nota(nota=78, nombre_estudiante="Juan sin miedo")
-nota2 = Nota(nota=40, nombre_estudiante="Juanito")
+if __name__ == "__main__":
+    nota = Nota(nota=78, nombre_estudiante="Juan sin miedo")
+    nota2 = Nota(nota=40, nombre_estudiante="Juanito")
 
-nota.ha_pasado()
-nota2.ha_pasado()
+    nota.ha_pasado()
+    nota2.ha_pasado()

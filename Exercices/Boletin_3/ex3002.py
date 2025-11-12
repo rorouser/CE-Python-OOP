@@ -11,6 +11,7 @@ class Libro:
     def mostrar_informaciones(self):
         print(f"\nTitulo: {self.titulo} Precio: {self.precio} Autor: {self.nombre_autor} ")
 
-libro = Libro(titulo='Van Halen', precio=10.50, nombre_autor='Corazon')
+if __name__ == "__main__":
+    libro = Libro(titulo='Van Halen', precio=10.50, nombre_autor='Corazon')
 
-libro.mostrar_informaciones()
+    libro.mostrar_informaciones()

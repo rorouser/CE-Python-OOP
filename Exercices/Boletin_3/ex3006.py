@@ -18,6 +18,7 @@ class Persona:
             return False
 
 
-persona = Persona("Juanito", 10 , "Masculino")
-persona.presentarse()
-print("Es adulto" if persona.esAdulto() else "Es menor de edad")
+if __name__ == "__main__":
+    persona = Persona("Juanito", 10 , "Masculino")
+    persona.presentarse()
+    print("Es adulto" if persona.esAdulto() else "Es menor de edad")

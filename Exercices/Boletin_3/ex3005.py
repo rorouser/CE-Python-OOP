@@ -17,7 +17,8 @@ class Operacion:
             print(f"\nDivisión de x / y: {self.x / self.y}")
 
 
-operacion = Operacion(x=5, y=0)
-operacion.suma()
-operacion.multiplicacion()
-operacion.division()
+if __name__ == "__main__":
+    operacion = Operacion(x=5, y=0)
+    operacion.suma()
+    operacion.multiplicacion()
+    operacion.division()

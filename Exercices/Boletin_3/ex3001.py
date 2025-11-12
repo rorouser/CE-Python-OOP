@@ -9,6 +9,7 @@ class Galleta:
     def __hornear__(self):
         print(f"Esta galleta {self.nombre} ha sido horneada en forma de {self.forma} \nBuen provecho")
 
-galleta = Galleta('cookies and cream', 'corazon')
+if __name__ == "__main__":
+    galleta = Galleta('cookies and cream', 'corazon')
 
-galleta.__hornear__()
+    galleta.__hornear__()
