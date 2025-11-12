@@ -9,8 +9,8 @@ class Libro:
         self.precio = precio
 
     def mostrar_informaciones(self):
-        print(f"\nTitulo: {self.titulo} Precio: {self.precio} Autor: {self.titulo} ")
+        print(f"\nTitulo: {self.titulo} Precio: {self.precio} Autor: {self.nombre_autor} ")
 
-libro = Libro(titulo='cookies and cream', precio=10.50, nombre_autor='corazon')
+libro = Libro(titulo='Van Halen', precio=10.50, nombre_autor='Corazon')
 
 libro.mostrar_informaciones()
