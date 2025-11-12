@@ -19,7 +19,7 @@ class Circulo:
     def mostrar_propiedades(self):
         print(f"\nRadio: {self.radio} \nPosición del centro: {self.posicion_centro}")
 
-nota = Circulo(r=5, x=1, y=2)
-nota.area()
-nota.perimetro()
-nota.mostrar_propiedades()
+circulo = Circulo(r=5, x=1, y=2)
+circulo.area()
+circulo.perimetro()
+circulo.mostrar_propiedades()
