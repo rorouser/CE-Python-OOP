@@ -275,16 +275,16 @@ def main():
                 # 4 - Generar informe de estadísticas
                 if tareas_cargadas:
                     try:
-                        pass
+                        print(utils.generar_informe_estadisticas(tareas))
 
                     except Exception as e:
                         print(f"Error al recuperar documentos: {e}")
                 else:
                     print("Opción no válida, intenta de nuevo.")
 
-            case "--help":
+            case "--info":
                 try:
-                    print("Documentación de las funciones del sistema")
+                    print(utils.get_info())
 
                 except Exception as e:
                     print(f"Error al recuperar documentos: {e}")

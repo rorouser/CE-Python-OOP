@@ -11,6 +11,26 @@ def mostrar_tareas(lista):
     for t in lista:
         print(t)
 
+def get_info():
+    return """
+    === INFO DEL SISTEMA ===
+
+    Esta aplicación permite gestionar una lista de tareas personales.
+    Incluye funciones para:
+
+    • Cargar y guardar tareas desde archivo
+    • Listar todas las tareas o filtrarlas por estado
+    • Agregar nuevas tareas con descripción, prioridad y categorías
+    • Editar tareas existentes
+    • Eliminar tareas
+    • Buscar tareas por palabra clave
+    • Marcar tareas como completadas
+    • Generar un informe de estadísticas sobre el estado de las tareas
+
+    Navega por los menús introduciendo el número correspondiente.
+    Escribe '--info' en cualquier momento para volver a ver esta información.
+    """
+
 def mostrarMenu(menu = 0, tareas_cargadas = True):
     match menu:
         case 0:
@@ -22,7 +42,7 @@ def mostrarMenu(menu = 0, tareas_cargadas = True):
                 print(" 2 - Tareas")
                 print(" 3 - Guardar cambios")
                 print(" 4 - Generar informe de estadísticas")
-            print(" --help")
+            print(" --info")
         case 2:
             print("     0 - Salir al menú principal")
             print("     1 - Listar tareas")
@@ -51,6 +71,41 @@ def mostrarMenu(menu = 0, tareas_cargadas = True):
             print("         1 - Listar tareas pendientes")
             print("         2 - Marcar como completada")
 
+def generar_informe_estadisticas(tareas):
+    """
+    Genera informe de estadisticas en la aplicacion sobre si las tareas están completadas, pendientes y el porcentaje de las tareas completas.
+    """
+    if not tareas:
+        return "No hay tareas cargadas para generar estadísticas.\n"
+
+    total = len(tareas)
+    completadas = sum(t.completada for t in tareas)
+    pendientes = total - completadas
+    porcentaje = (completadas / total * 100) if total else 0
+
+    prioridades = {p: sum(1 for t in tareas if t.prioridad.value == p)  for p in {t.prioridad.value for t in tareas}}
+
+    categorias = {c: sum(1 for t in tareas if t.categoria.principal.value == c) for c in {t.categoria.principal.value for t in tareas}}
+
+    subcategorias = {s: sum(1 for t in tareas if t.categoria.sub and t.categoria.sub.value == s) for s in {t.categoria.sub.value for t in tareas if t.categoria.sub}}
+
+    informe = [
+        "=== INFORME DE ESTADÍSTICAS ===\n",
+        f"Total de tareas: {total}",
+        f"Tareas completadas: {completadas}",
+        f"Tareas pendientes: {pendientes}",
+        f"Porcentaje completadas: {porcentaje:.2f}%\n",
+        "=== Por prioridad ===",
+        *[f"  {p.capitalize()}: {i}" for p, i in prioridades.items()],
+        "\n=== Por categoría ===",
+        *[f"  {c}: {i}" for c, i in categorias.items()],
+        "\n=== Por subcategoría ===",
+        *[f"  {s}: {i}" for s, i in subcategorias.items()],
+        ""
+    ]
+
+    return "\n".join(informe)
+
 
 def buscar_por_palabra_clave(estructura, categoria_buscada, tarea=None):
     """
@@ -61,7 +116,6 @@ def buscar_por_palabra_clave(estructura, categoria_buscada, tarea=None):
     """
     resultados = []
 
-    # 🧩 Caso 1: si es lista → recorrer recursivamente
     if isinstance(estructura, list):
         if not estructura:
             return []
@@ -70,43 +124,33 @@ def buscar_por_palabra_clave(estructura, categoria_buscada, tarea=None):
             + buscar_por_palabra_clave(estructura[1:], categoria_buscada, tarea)
         )
 
-    # 🧩 Caso 2: si es una tarea
     if isinstance(estructura, Tarea):
         tarea = estructura
-
-        # Normalizamos la búsqueda
         busqueda = categoria_buscada.strip().lower() if isinstance(categoria_buscada, str) else categoria_buscada
 
-        # --- Buscar coincidencia por prioridad ---
         if (
             (isinstance(busqueda, Prioridad) and tarea.prioridad == busqueda)
             or (isinstance(busqueda, str) and busqueda in tarea.prioridad.value.lower())
         ):
             resultados.append(tarea)
 
-        # --- Buscar coincidencias en la descripción ---
         if isinstance(busqueda, str) and busqueda in tarea.descripcion.lower():
             resultados.append(tarea)
 
-        # --- Buscar coincidencias en la categoría ---
         resultados += buscar_por_palabra_clave(estructura.categoria, categoria_buscada, tarea)
         return resultados
 
-    # 🧩 Caso 3: si es una categoría
     if isinstance(estructura, Categoria):
         cat = estructura
         busqueda = categoria_buscada.strip().lower() if isinstance(categoria_buscada, str) else categoria_buscada
 
-        # --- Si la búsqueda es un Enum de categoría principal ---
         if isinstance(busqueda, CategoriaPrincipal) and cat.principal == busqueda:
             resultados.append(tarea)
 
-        # --- Si es un Enum de subcategoría ---
         elif any(isinstance(busqueda, sub_enum) for sub_enum in SUBCATEGORIAS_POR_CATEGORIA.values()):
             if cat.sub == busqueda:
                 resultados.append(tarea)
 
-        # --- Si es texto: coincidencias parciales (no exactas) ---
         elif isinstance(busqueda, str):
             if (
                 busqueda in cat.principal.value.lower()
@@ -116,5 +160,4 @@ def buscar_por_palabra_clave(estructura, categoria_buscada, tarea=None):
 
         return resultados
 
-    # 🧩 Caso 4: otro tipo → nada que buscar
     return []
