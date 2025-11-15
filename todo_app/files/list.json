@@ -1,7 +1,7 @@
 [
     {
         "id": 1,
-        "descripcion": "Estudiar Python Macaco",
+        "descripcion": "Estudiar Python",
         "prioridad": "Alta",
         "completada": true,
         "categoria": {
