@@ -1,0 +1,3 @@
+https://colab.research.google.com/drive/1Rx5OVaxUEIzH20VdI78OeefoZlnleT2L?usp=sharing
+
+https://github.com/rorouser/CE-Python-OOP
