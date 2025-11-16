@@ -1,9 +1,11 @@
-from entities import *
+from todo_app.data.entities import *
 
 def buscar_tareas(tareas, id):
+    '''Busca y devuelve la tarea con el id indicado de la lista dada.'''
     return [t for t in tareas if t.id == int(id)][0]
 
 def mostrar_tareas(lista):
+    '''Muestra por pantalla las tareas de la lista dada.'''
     if not lista:
         print("No hay tareas para mostrar.")
         return
@@ -12,6 +14,7 @@ def mostrar_tareas(lista):
         print(t)
 
 def get_info():
+    ''''Devuelve la información del sistema como una cadena de texto.'''
     return """
     === INFO DEL SISTEMA ===
 
@@ -32,6 +35,7 @@ def get_info():
     """
 
 def mostrarMenu(menu = 0, tareas_cargadas = True):
+    '''Muestra el menú de opciones según el nivel indicado.'''
     match menu:
         case 0:
             print(" MENÚ DE OPCIONES")
@@ -71,41 +75,51 @@ def mostrarMenu(menu = 0, tareas_cargadas = True):
             print("         1 - Listar tareas pendientes")
             print("         2 - Marcar como completada")
 
-def generar_informe_estadisticas(tareas):
-    """
-    Genera informe de estadisticas en la aplicacion sobre si las tareas están completadas, pendientes y el porcentaje de las tareas completas.
-    """
-    if not tareas:
-        return "No hay tareas cargadas para generar estadísticas.\n"
 
-    total = len(tareas)
-    completadas = sum(t.completada for t in tareas)
-    pendientes = total - completadas
-    porcentaje = (completadas / total * 100) if total else 0
+def pedir_prioridad():
+    """Pide al usuario que elija una prioridad válida."""
+    opciones = [p.value for p in Prioridad]
+    print(f"Opciones de prioridad: {', '.join(o.capitalize() for o in opciones)}")
 
-    prioridades = {p: sum(1 for t in tareas if t.prioridad.value == p)  for p in {t.prioridad.value for t in tareas}}
+    # Pedir al usuario hasta que elija una válida
+    while True:
+        entrada = input("Prioridad: ").strip().capitalize()
+        if entrada in opciones:
+            return Prioridad(entrada)
+        print("Opción no válida. Intenta de nuevo.")
 
-    categorias = {c: sum(1 for t in tareas if t.categoria.principal.value == c) for c in {t.categoria.principal.value for t in tareas}}
+def pedir_categoria():
+    """Pide al usuario que elija una categoría principal válida."""
+    opciones = [c.value for c in CategoriaPrincipal]
+    print(f"Opciones de categoría: {', '.join(opciones)}")
 
-    subcategorias = {s: sum(1 for t in tareas if t.categoria.sub and t.categoria.sub.value == s) for s in {t.categoria.sub.value for t in tareas if t.categoria.sub}}
+    while True:
+        entrada = input("Categoría: ").strip().capitalize()
+        for cat in CategoriaPrincipal:
+            if cat.value.lower() == entrada.lower():
+                return cat
+        print("Categoría no válida. Intenta de nuevo.")
 
-    informe = [
-        "=== INFORME DE ESTADÍSTICAS ===\n",
-        f"Total de tareas: {total}",
-        f"Tareas completadas: {completadas}",
-        f"Tareas pendientes: {pendientes}",
-        f"Porcentaje completadas: {porcentaje:.2f}%\n",
-        "=== Por prioridad ===",
-        *[f"  {p.capitalize()}: {i}" for p, i in prioridades.items()],
-        "\n=== Por categoría ===",
-        *[f"  {c}: {i}" for c, i in categorias.items()],
-        "\n=== Por subcategoría ===",
-        *[f"  {s}: {i}" for s, i in subcategorias.items()],
-        ""
-    ]
 
-    return "\n".join(informe)
+def pedir_subcategoria(categoria_principal):
+    '''
+    Pide una subcategoría válida según la categoría principal seleccionada.
+    Recibe un valor de CategoriaPrincipal.
+    '''
+    sub_enum_cls = SUBCATEGORIAS_POR_CATEGORIA.get(categoria_principal)
+    if not sub_enum_cls:
+        print(f"No hay subcategorías definidas para {categoria_principal.value}.")
+        return None
 
+    opciones = [s.value for s in sub_enum_cls]
+    print(f"Opciones de subcategoría para {categoria_principal.value}: {', '.join(opciones)}")
+
+    while True:
+        entrada = input("Subcategoría: ").strip().capitalize()
+        for sub in sub_enum_cls:
+            if sub.value.lower() == entrada.lower():
+                return sub
+        print("Subcategoría no válida. Intenta de nuevo.")
 
 def buscar_por_palabra_clave(estructura, categoria_buscada, tarea=None):
     """

@@ -41,7 +41,7 @@ class Categoria:
     _sub: Enum  # puede ser cualquiera de los enums de subcategoría
 
     def __init__(self, principal, sub):
-        # Permitir strings o Enums
+        '''Constructor de la clase Categoria.'''
         if isinstance(principal, str):
             principal = CategoriaPrincipal(principal.capitalize())
 
@@ -50,9 +50,7 @@ class Categoria:
         if sub_enum_cls is None:
             raise ValueError(f"No hay subcategorías definidas para la categoría {principal.value}")
 
-        # Permitir strings para subcategoría
         if isinstance(sub, str):
-            # Buscar en el Enum correspondiente
             try:
                 sub = next(s for s in sub_enum_cls if s.value.lower() == sub.lower())
             except StopIteration:
@@ -61,7 +59,6 @@ class Categoria:
                     f"Opciones válidas: {[s.value for s in sub_enum_cls]}"
                 )
 
-        # Validar que el sub sea del Enum correcto
         if not isinstance(sub, sub_enum_cls):
             raise ValueError(
                 f"La subcategoría '{sub}' no pertenece a la categoría '{principal.value}'."
@@ -89,6 +86,7 @@ class Categoria:
             self._sub = sub
 
     def __str__(self):
+        '''Representación en cadena de la clase Categoria.'''
         return f"Categoría: {self.principal.value} / {self.sub.value}"
 
 @dataclass
@@ -100,6 +98,7 @@ class Tarea:
     _categoria: Categoria
 
     def __init__(self, id, descripcion, prioridad, completada, categoria):
+        '''Constructor de la clase Tarea.'''
         self._id = id
         self._descripcion = descripcion
         self._prioridad = prioridad
@@ -178,6 +177,7 @@ class Tarea:
                    data['categoria'])
 
     def __str__(self):
+        '''Representación en cadena de la clase Tarea.'''
         return (f"""
            ID: {self.id}
            Descripción: {self.descripcion}

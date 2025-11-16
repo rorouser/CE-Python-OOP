@@ -1,9 +1,10 @@
-import utils
-import data_handler
-from entities import *
+from todo_app.data import data_handler
+from todo_app.data.entities import *
+from todo_app.bussiness import reports, utils
 
-# Función del programa principal
+
 def main():
+    '''Función principal de la aplicación de gestión de tareas.'''
     continuar = True
     tareas = []
     tareas_cargadas = False
@@ -91,9 +92,9 @@ def main():
                                 # 2 - Agregar una tarea
                                 try:
                                     descripcion = input("Descripción: ")
-                                    prioridad = pedir_prioridad()
-                                    categoria = pedir_categoria()
-                                    subcategoria = pedir_subcategoria(categoria)
+                                    prioridad = utils.pedir_prioridad()
+                                    categoria = utils.pedir_categoria()
+                                    subcategoria = utils.pedir_subcategoria(categoria)
                                     tarea = Tarea(
                                                 id = max([t.id for t in tareas], default=0) + 1,
                                                 descripcion = descripcion,
@@ -150,7 +151,7 @@ def main():
                                                             case "2":
                                                                 # 2 - Editar prioridad
                                                                 print('Prioridad actual: ', tarea.prioridad)
-                                                                prioridad = pedir_prioridad()
+                                                                prioridad = utils.pedir_prioridad()
                                                                 tarea.prioridad = prioridad
                                                                 print('Prioridad cambiada correctamente: ', tarea.prioridad)
                                                                 guardado = False
@@ -158,8 +159,8 @@ def main():
                                                             case "3":
                                                                 # 3 - Editar categoria
                                                                 print('Categoria actual: ', tarea.categoria)
-                                                                categoria = pedir_categoria()
-                                                                subcategoria = pedir_subcategoria(categoria)
+                                                                categoria = utils.pedir_categoria()
+                                                                subcategoria = utils.pedir_subcategoria(categoria)
                                                                 tarea.categoria.principal = categoria
                                                                 tarea.categoria.sub = subcategoria
                                                                 print('Categoria cambiada correctamente: ', tarea.categoria)
@@ -168,7 +169,7 @@ def main():
                                                             case "4":
                                                                 # 4 - Editar subcategoria
                                                                 print('Subcategoria actual: ', tarea.categoria)
-                                                                subcategoria = pedir_subcategoria(tarea.categoria.principal)
+                                                                subcategoria = utils.pedir_subcategoria(tarea.categoria.principal)
                                                                 tarea.categoria.sub = subcategoria
                                                                 print('Subcategoria cambiada correctamente: ', tarea.categoria)
                                                                 guardado = False
@@ -275,7 +276,7 @@ def main():
                 # 4 - Generar informe de estadísticas
                 if tareas_cargadas:
                     try:
-                        print(utils.generar_informe_estadisticas(tareas))
+                        print(reports.generar_informe_estadisticas(tareas))
 
                     except Exception as e:
                         print(f"Error al recuperar documentos: {e}")
@@ -292,49 +293,6 @@ def main():
             case _:
                 print("Opción no válida, intenta de nuevo.")
 
-def pedir_prioridad():
-    opciones = [p.value for p in Prioridad]
-    print(f"Opciones de prioridad: {', '.join(o.capitalize() for o in opciones)}")
-
-    # Pedir al usuario hasta que elija una válida
-    while True:
-        entrada = input("Prioridad: ").strip().capitalize()
-        if entrada in opciones:
-            return Prioridad(entrada)
-        print("Opción no válida. Intenta de nuevo.")
-
-def pedir_categoria():
-    """Pide al usuario que elija una categoría principal válida."""
-    opciones = [c.value for c in CategoriaPrincipal]
-    print(f"Opciones de categoría: {', '.join(opciones)}")
-
-    while True:
-        entrada = input("Categoría: ").strip().capitalize()
-        for cat in CategoriaPrincipal:
-            if cat.value.lower() == entrada.lower():
-                return cat
-        print("Categoría no válida. Intenta de nuevo.")
-
-
-def pedir_subcategoria(categoria_principal):
-    """
-    Pide una subcategoría válida según la categoría principal seleccionada.
-    Recibe un valor de CategoriaPrincipal.
-    """
-    sub_enum_cls = SUBCATEGORIAS_POR_CATEGORIA.get(categoria_principal)
-    if not sub_enum_cls:
-        print(f"No hay subcategorías definidas para {categoria_principal.value}.")
-        return None
-
-    opciones = [s.value for s in sub_enum_cls]
-    print(f"Opciones de subcategoría para {categoria_principal.value}: {', '.join(opciones)}")
-
-    while True:
-        entrada = input("Subcategoría: ").strip().capitalize()
-        for sub in sub_enum_cls:
-            if sub.value.lower() == entrada.lower():
-                return sub
-        print("Subcategoría no válida. Intenta de nuevo.")
 
 if __name__ == "__main__":
     main()
