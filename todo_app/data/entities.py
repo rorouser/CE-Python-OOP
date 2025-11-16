@@ -12,7 +12,8 @@ class CategoriaPrincipal(Enum):
     ESTUDIO = "Estudio"
 
 class Subcategoria(Enum):
-    pass
+    '''Clase base para subcategorías, no instanciable directamente'''
+    ...
 
 class SubcategoriaTrabajo(Subcategoria):
     REUNIONES = "Reuniones"
