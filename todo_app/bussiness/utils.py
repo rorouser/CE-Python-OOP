@@ -13,6 +13,16 @@ def mostrar_tareas(lista):
     for t in lista:
         print(t)
 
+def crear_tarea(tareas, descripcion, prioridad, categoria, subcategoria):
+    '''Crea y devuelve la tarea'''
+    return Tarea(
+                id = max([t.id for t in tareas], default=0) + 1,
+                descripcion = descripcion,
+                prioridad = prioridad,
+                completada = False,
+                categoria = Categoria(principal = categoria,
+                                      sub = subcategoria))
+
 def get_info():
     ''''Devuelve la información del sistema como una cadena de texto.'''
     return """

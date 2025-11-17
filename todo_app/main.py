@@ -95,13 +95,7 @@ def main():
                                     prioridad = utils.pedir_prioridad()
                                     categoria = utils.pedir_categoria()
                                     subcategoria = utils.pedir_subcategoria(categoria)
-                                    tarea = Tarea(
-                                                id = max([t.id for t in tareas], default=0) + 1,
-                                                descripcion = descripcion,
-                                                prioridad = prioridad,
-                                                completada = False,
-                                                categoria = Categoria(principal = categoria,
-                                                                      sub = subcategoria))
+                                    tarea = utils.crear_tarea(tareas, descripcion, prioridad, categoria, subcategoria)
                                     print(tarea)
                                     tareas.append(tarea)
                                     print("Tarea creada con exito.")

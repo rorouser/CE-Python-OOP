@@ -2,12 +2,10 @@ import json
 import os
 from todo_app.data.entities import *
 
-def cargar_lista_json():
+def cargar_lista_json(ruta='./files/list.json'):
     '''
     Función para cargar la lista de tareas en el sistema
     '''
-    ruta = './files/list.json'
-
     if not os.path.exists(ruta):
         raise FileNotFoundError(f"No se encontró el archivo de tareas")
 
@@ -32,7 +30,7 @@ def guardar_lista_json(tareas):
     try:
         tareas_dccionario = [t.to_json() for t in tareas]
 
-        with open('../files/list.json', 'w', encoding='utf-8') as f:
+        with open('./files/list.json', 'w', encoding='utf-8') as f:
             json.dump(tareas_dccionario, f, indent=4)
 
     except json.JSONDecodeError as e:
