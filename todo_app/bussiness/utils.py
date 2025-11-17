@@ -48,6 +48,7 @@ def mostrarMenu(menu = 0, tareas_cargadas = True):
     '''Muestra el menú de opciones según el nivel indicado.'''
     match menu:
         case 0:
+            print("\n=== TASKMASTER CLI ===\n",)
             print(" MENÚ DE OPCIONES")
             print(" 0 - Salir de la aplicacion") #añadir un desea salir sin guardar?
             if not tareas_cargadas:
@@ -56,34 +57,34 @@ def mostrarMenu(menu = 0, tareas_cargadas = True):
                 print(" 2 - Tareas")
                 print(" 3 - Guardar cambios")
                 print(" 4 - Generar informe de estadísticas")
-            print(" --info")
+            print(" --info\n")
         case 2:
-            print("     0 - Salir al menú principal")
+            print("\n     0 - Salir al menú principal")
             print("     1 - Listar tareas")
             print("     2 - Agregar una tarea")
             print("     3 - Editar una tarea")
             print("     4 - Eliminar una tarea")
             print("     5 - Buscar tareas por palabra clave")
-            print("     6 - Marcar como completada")
+            print("     6 - Marcar como completada\n")
         case 3:
-            print("         0 - Volver")
+            print("\n         0 - Volver")
             print("         1 - Listar todas las tareas")
             print("         2 - Listar tareas completadas")
-            print("         3 - Listar tareas pendientes")
+            print("         3 - Listar tareas pendientes\n")
         case 4:
-            print("         0 - Volver")
+            print("\n         0 - Volver")
             print("         1 - Listar tareas")
-            print("         2 - Editar tarea")
+            print("         2 - Editar tarea\n")
         case 5:
-            print("             0 - Volver")
+            print("\n             0 - Volver")
             print("             1 - Editar descripcion")
             print("             2 - Editar prioridad")
             print("             3 - Editar categoria")
-            print("             4 - Editar subcategoria")
+            print("             4 - Editar subcategoria\n")
         case 6:
-            print("         0 - Volver")
+            print("\n         0 - Volver")
             print("         1 - Listar tareas pendientes")
-            print("         2 - Marcar como completada")
+            print("         2 - Marcar como completada\n")
 
 
 def pedir_prioridad():
