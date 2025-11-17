@@ -21,7 +21,7 @@
     },
     {
         "id": 4,
-        "descripcion": "desc",
+        "descripcion": "Comprar acciones de Nvidia",
         "prioridad": "Alta",
         "completada": false,
         "categoria": {
@@ -53,10 +53,20 @@
         "id": 7,
         "descripcion": "Llamada con RRHH",
         "prioridad": "Alta",
-        "completada": false,
+        "completada": true,
         "categoria": {
             "principal": "Trabajo",
             "sub": "Reuniones"
+        }
+    },
+    {
+        "id": 8,
+        "descripcion": "Examen de IA",
+        "prioridad": "Alta",
+        "completada": false,
+        "categoria": {
+            "principal": "Estudio",
+            "sub": "Examenes"
         }
     }
 ]
