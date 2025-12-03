@@ -27,7 +27,7 @@ class SQLiteConector:
         try:
             self.cursor.execute('''
                         CREATE TABLE IF NOT EXISTS oficinas (
-                            id_ofi INTEGER PRIMARY KEY,
+                            id_ofi INTEGER PRIMARY KEY AUTOINCREMENT,
                             domicilio TEXT NOT NULL,
                             superficie REAL NOT NULL)
                         ''')
@@ -36,7 +36,7 @@ class SQLiteConector:
 
             self.cursor.execute('''
                         CREATE TABLE IF NOT EXISTS empleados (
-                            id_emp INTEGER PRIMARY KEY,
+                            id_emp INTEGER PRIMARY KEY AUTOINCREMENT,
                             nombre TEXT NOT NULL,
                             fecha_nacimiento DATE NOT NULL,
                             oficina INTEGER NOT NULL,
@@ -57,20 +57,17 @@ class SQLiteConector:
             return
         try:
             if tabla == 'oficinas':
-                datos_procesados = [(int(reg[0]), f"{reg[1]}, {reg[2]}", float(reg[3]))for reg in datos]
+                datos_procesados = [(f"{reg[0]}, {reg[1]}", float(reg[2]))for reg in datos]
                 self.cursor.executemany('''
-                    INSERT INTO oficinas (id_ofi, domicilio, superficie)
-                    VALUES (?, ?, ?)
+                    INSERT INTO oficinas (domicilio, superficie)
+                    VALUES (?, ?)
                 ''', datos_procesados)
 
             elif tabla == 'empleados':
-                datos_procesados = [
-                    (int(reg[0]), reg[1], reg[2], int(reg[3]), reg[4], reg[5])
-                    for reg in datos
-                ]
+                datos_procesados = [(reg[0], reg[1], int(reg[2]), reg[3], reg[4])for reg in datos]
                 self.cursor.executemany('''
-                    INSERT INTO empleados (id_emp, nombre, fecha_nacimiento, oficina, puesto, contrato)
-                    VALUES (?, ?, ?, ?, ?, ?)
+                    INSERT INTO empleados (nombre, fecha_nacimiento, oficina, puesto, contrato)
+                    VALUES ( ?, ?, ?, ?, ?)
                 ''', datos_procesados)
             else:
                 print("Tabla no reconocida.")
@@ -113,8 +110,8 @@ class SQLiteConector:
             print(f"Error al consultar empleados: {e}")
             return []
 
-    def consultar_oficinas_por_rango_edad(self, edad_min, edad_max):
-        """Devuelve todos las oficinas de una ciudad determinada"""
+    def consultar_empleados_por_rango_edad(self, edad_min, edad_max):
+        """Devuelve todos las empleados por rango de edad"""
         if self.conexion is None or self.cursor is None:
             print("Error: No hay conexión con la base de datos.")
             return []
@@ -131,53 +128,3 @@ class SQLiteConector:
         except sqlite3.Error as e:
             print(f"Error al consultar empleados: {e}")
             return []
-    
-    # Al método le puedes añadir los parámetros que consideres
-    def encontrarDocumento(self, nombreColeccion, pipeline):
-        """Devuelve el primer documento con una condicion """
-        if self.db is not None:
-            return self.db[nombreColeccion].find(pipeline)
-        else:
-            print("Error: No hay conexión con la base de datos.")
-            return []
-
-    def insertarEnLista(self, nombreColeccion, restaurante_id, campo_lista, nuevo_elemento):
-        """Inserta un nuevo elemento dentro de una lista de un documento"""
-        if self.db is None:
-            print("Error: No hay conexión con la base de datos.")
-            return 0
-
-        try:
-            resultado = self.db[nombreColeccion].update_one(
-                {"restaurante_id": restaurante_id},
-                {"$push": {campo_lista: nuevo_elemento}}
-            )
-            return resultado
-        except Exception as e:
-            print(f"Error al insertar en la lista: {e}")
-            return 0
-
-    # Al método le puedes añadir los parámetros que consideres
-    def obtenerAgregacion(self, nombreColeccion, pipeline):
-        """Ejecuta una agregación en la colección dada y devuelve el resultado."""
-        if self.db is not None:
-            return list(self.db[nombreColeccion].aggregate(pipeline))
-        else:
-            print("Error: No hay conexión con la base de datos.")
-            return []
-        
-    # Al método le puedes añadir los parámetros que consideres
-    def borrarDocumentosColeccion(self, nombreColeccion):
-        """Devuelve el número de documentos borrados """
-        if self.db is None:
-            print("Error: No hay conexión con la base de datos.")
-            return 0 
-
-        try:
-            resultado = self.db[nombreColeccion].delete_many({})
-            return resultado.deleted_count 
-        except Exception as e:
-            print(f"Error al borrar documentos: {e}")
-            return 0
-    
-

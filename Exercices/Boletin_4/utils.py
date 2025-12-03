@@ -1,10 +1,13 @@
-def mostrarMenu():
+import os
+
+def mostrarMenu(cargados_txt: bool):
     print("=" * 60)
     print("MENÚ DE GESTIÓN DE EMPRESA")
     print("=" * 60)
     print("0 - Salir")
     print("1 - Crear la base de datos Empresa con SQLite")
-    print("2 - Cargar datos desde fichero empleados.txt")
+    if not cargados_txt:
+        print("2 - Cargar datos desde fichero empleados.txt")
     print("3 - Mostrar todos los empleados")
     print("4 - Mostrar oficinas de una ciudad determinada")
     print("5 - Mostrar empleados por rango de edad")
@@ -26,7 +29,7 @@ def leer_fichero(nombre_archivo, num_campos):
                 linea = linea.strip()
                 if linea:
                     campos = linea.split(';')
-
+                    del campos[0]
                     if len(campos) == num_campos:
                         datos.append(tuple(campos))
                     else:
@@ -39,3 +42,15 @@ def leer_fichero(nombre_archivo, num_campos):
     except Exception as e:
         print(f"Error al leer el archivo: {e}")
         return []
+
+def borrar_base_datos(nombre_archivo='Empresa.db'):
+    """Borra el archivo de base de datos SQLite."""
+    try:
+        if os.path.exists(nombre_archivo):
+            os.remove(nombre_archivo)
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(f"Error al eliminar la base de datos: {e}")
+        return False

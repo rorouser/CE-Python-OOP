@@ -7,46 +7,46 @@ import utils
 def main():
     continuar = True
     sqliteconector= None
-    nombreColeccion = "restaurantes"
+    cargados_txt = False
     
     while continuar:
-        utils.mostrarMenu()
+        utils.mostrarMenu(cargados_txt)
         opcion = input("Seleccione una opción: ")
         match opcion:
             case "0":
-                # Finalizar el programa sin usar el break
                 print ("0")
+                if sqliteconector is not None:
+                    sqliteconector.cerrar_conexion()
+                utils.borrar_base_datos()
                 continuar = False
 
             case "1":
-                # Crear la conexión a la BBDD y guardar en variable
                 print("1")
                 sqliteconector = SQLiteConector()
                 sqliteconector.crear_bd()
                 print(sqliteconector)
 
             case "2":
-                # Cargar el fichero y realizar el insert a la base de datos siempre que se haya establecido la conexión con la base de datos
-                print ("2")
-                if sqliteconector is None:
-                    print("Error: No se ha establecido conexión con la base de datos.")
-                    return
-                try:
-                    oficinas = utils.leer_fichero('data/oficinas.txt', 4)
+                if not cargados_txt:
+                    print ("2")
+                    if sqliteconector is None:
+                        print("Error: No se ha establecido conexión con la base de datos.")
+                        return
+                    try:
+                        oficinas = utils.leer_fichero('data/oficinas.txt', 3)
+                        if oficinas:
+                            sqliteconector.insertar_registros(oficinas, 'oficinas')
+                            print(f"Se cargaron {len(oficinas)} oficinas correctamente")
+                        empleados = utils.leer_fichero('data/empleados.txt', 5)
 
-                    if oficinas:
-                        sqliteconector.insertar_registros(oficinas, 'oficinas')
-                        print(f"Se cargaron {len(oficinas)} oficinas correctamente")
-
-                    # Leer empleados con 7 campos (pero solo usar 6)
-                    empleados = utils.leer_fichero('data/empleados.txt', 6)
-
-                    if empleados:
-                        sqliteconector.insertar_registros(empleados, 'empleados')
-                        print(f"Se cargaron {len(empleados)} empleados correctamente")
-
-                except Exception as e:
-                        print(f"Error al insertar documentos: {e}")
+                        if empleados:
+                            sqliteconector.insertar_registros(empleados, 'empleados')
+                            print(f"Se cargaron {len(empleados)} empleados correctamente")
+                        cargados_txt = True
+                    except Exception as e:
+                            print(f"Error al insertar documentos: {e}")
+                else:
+                    print("Opción no válida.")
 
             case "3":
                 print ("3")
@@ -94,123 +94,44 @@ def main():
                     print("=" * 60)
                     print(f"Empleados de edad entre {edad_min} y {edad_max}")
                     print("=" * 60)
-                    empleados = sqliteconector.consultar_oficinas_por_rango_edad(edad_min, edad_max)
+                    empleados = sqliteconector.consultar_empleados_por_rango_edad(edad_min, edad_max)
                     if not empleados:
                         print("No se ha encontrado empleados en este rango de edad")
                     else:
                         [print(f'{i}\n') for i in empleados]
-                    [print(f'{i}\n') for i in empleados]
                 except Exception as e:
                     print(f"Error al recuperar documentos: {e}")
             case "6":
-                # Mostrar los cinco restaurantes con mejor calificación promedio siempre que se haya establecido la conexión con la base de datos
-                print ("6")
-                if conexion is None:
-                    print("Error: No se ha establecido conexión con la base de datos.")
-                    return 
-                try:
-
-                    pipeline = [
-                        {"$unwind": "$notas"},
-                        {"$match": {"notas.puntuacion": {"$exists": True, "$ne": None}}},  # Filtrar puntuaciones nulas
-                        {"$addFields": {
-                            "notas.puntuacion": {
-                                "$convert": {
-                                    "input": "$notas.puntuacion",
-                                    "to": "double",
-                                    "onError": 0,
-                                    "onNull": 0 
-                                }
-                            }
-                        }},
-                        {"$group": {
-                            "_id": "$nombre",
-                            "calificacion_promedio": {"$avg": "$notas.puntuacion"}
-                        }},
-                        {"$sort": {"calificacion_promedio": -1}},
-                        {"$limit": 5},
-                        {"$project": {
-                            "_id": 0,
-                            "nombre": "$_id",
-                            "promedio": {"$round": ["$calificacion_promedio", 2]}
-                        }}
-                    ]
-
-
-                    restaurantes = conexion.obtenerAgregacion(nombreColeccion, pipeline)
-
-                    if restaurantes:
-                        print("Los cinco restaurantes con mejor calificación promedio:")
-                        for restaurante in restaurantes:
-                            print(f"- {restaurante['nombre']}: {restaurante['promedio']:.2f}")
-                    else:
-                        print("No se encontraron datos.")
-                except Exception as e:
-                        print(f"Error al recuperar documentos: {e}")
-
-            case "7":
-                # Insertar una nota a un restaurante siempre que se haya establecido la conexión con la base de datos.
-                print("7")
-                if conexion is None:
+                print("6")
+                if sqliteconector is None:
                     print("Error: No se ha establecido conexión con la base de datos.")
                     return
-                
                 try:
-                    # Solicitar ID del restaurante en un bucle hasta que se encuentre uno válido
-                    while True:
-                        restaurante_id = input("Introduce el ID del restaurante: ")
-                        if not restaurante_id:
-                            print("El ID no puede estar vacío.")
-                            continue
-                        
-                        # Verificar si el restaurante existe
-                        restaurante = conexion.encontrarDocumento(nombreColeccion, {"restaurante_id": restaurante_id})
-                        
-                        if restaurante:
-                            break  
-                        else:
-                            print("Error: No se encontró un restaurante con ese ID. Inténtalo de nuevo.")
-
-                    # Validar la calificación
-                    calificaciones_validas = {"A", "B", "C", "P", "Z"}
-                    while True:
-                        calificacion = input("Introduce la calificación (A, B, C, P, Z): ").strip().upper()
-                        if calificacion in calificaciones_validas:
-                            break
-                        print("Error: Calificación no válida. Debe ser A, B, C, P o Z.")
-
-                    # Validar la puntuación
-                    while True:
-                        try:
-                            puntuacion = int(input("Introduce la puntuación (0-50): ").strip())
-                            if 0 <= puntuacion <= 50:
-                                break
-                            print("Error: La puntuación debe estar entre 0 y 50.")
-                        except ValueError:
-                            print("Error: Debes introducir un número válido.")
-
-                    # Obtener fecha actual en formato Unix timestamp (milisegundos)
-                    fecha_actual = int(datetime.now(timezone.utc).timestamp() * 1000)
-                    
-                    fecha_h = datetime.fromtimestamp(fecha_actual / 1000, tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-
-                    # Crear la nueva nota
-                    nueva_nota = {
-                        "fecha": {"$date": fecha_actual},
-                        "calificacion": calificacion,
-                        "puntuacion": puntuacion
-                    }
-
-                    # Insertar la nota en la lista "notas" del restaurante
-                    resultado = conexion.insertarEnLista(nombreColeccion, restaurante_id, "notas", nueva_nota)
-
-                    if resultado.modified_count > 0:
-                        print(f"Nota agregada correctamente.\nCalificación: {calificacion}\nPuntuación: {puntuacion}\nFecha: {fecha_h}")
-                    else:
-                        print("No se pudo agregar la nota.")
-
+                    nombre = input('Introduce el nombre del empleado\n')
+                    fecha_nacimiento = input('Introduce la fecha de nacimiento del empleado (YYYY-MM-DD)\n')
+                    oficina = input('Introduce la oficina del empleado\n')
+                    puesto = input('Introduce el puesto del empleado\n')
+                    contrato = input('Introduce el tipo de contrato del empleado\n')
+                    empleado = [tuple([nombre, fecha_nacimiento, oficina, puesto, contrato])]
+                    sqliteconector.insertar_registros(empleado, 'empleados')
+                    print("Empleado insertado correctamente")
                 except Exception as e:
-                    print(f"Error al insertar la nota: {e}")
+                    print(f"Error al insertar el empleado: {e}")
+
+            case "7":
+                print("7")
+                if sqliteconector is None:
+                    print("Error: No se ha establecido conexión con la base de datos.")
+                    return
+                try:
+                    calle = input('Introduce el calle de la oficina\n')
+                    ciudad = input('Introduce la ciudad de la oficina\n')
+                    superficie = input('Introduce la superficie de la oficina\n')
+                    oficina = [tuple([calle, ciudad, superficie])]
+                    sqliteconector.insertar_registros(oficina, 'oficinas')
+                    print("Oficina insertada correctamente")
+                except Exception as e:
+                    print(f"Error al insertar la oficina: {e}")
 
             case "8":
                 # Encontrar el mejor restaurante de cada distrito según su puntuación media.
