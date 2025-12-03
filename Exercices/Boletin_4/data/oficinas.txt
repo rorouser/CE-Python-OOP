@@ -1,0 +1,15 @@
+1;Calle Mayor 12;Madrid;320
+2;Avenida Sol 88;Barcelona;410
+3;Calle Luna 5;Sevilla;280
+4;Gran Via 102;Madrid;500
+5;Paseo Colon 33;Valencia;350
+6;Calle Rio 20;Madrid;290
+7;Avenida Libertad 77;Bilbao;440
+8;Calle Norte 12;Málaga;310
+9;Paseo Sur 40;Sevilla;360
+10;Calle Jardin 3;Granada;270
+11;Avenida Francia 122;Málaga;390
+12;Calle Central 19;Barcelona;330
+13;Avenida del Mar 56;Vigo;410
+14;Calle Olivo 18;Santander;295
+15;Paseo Verde 9;Coruña;375
