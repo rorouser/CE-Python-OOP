@@ -67,7 +67,7 @@ class SQLiteConector:
                 datos_procesados = [(reg[0], reg[1], int(reg[2]), reg[3], reg[4])for reg in datos]
                 self.cursor.executemany('''
                     INSERT INTO empleados (nombre, fecha_nacimiento, oficina, puesto, contrato)
-                    VALUES ( ?, ?, ?, ?, ?)
+                    VALUES ( ?, ?, ?, ?, COALESCE(?, date('now')))
                 ''', datos_procesados)
             else:
                 print("Tabla no reconocida.")
