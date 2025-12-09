@@ -6,7 +6,7 @@ import utils
 # Función del programa principal
 def main():
     continuar = True
-    sqliteconector= None
+    sqliteconector = None
     cargados_txt = False
 
     try:
@@ -15,7 +15,7 @@ def main():
             opcion = input("Seleccione una opción: ")
             match opcion:
                 case "0":
-                    print ("0")
+                    print("0")
                     continuar = False
 
                 case "1":
@@ -26,7 +26,7 @@ def main():
 
                 case "2":
                     if not cargados_txt:
-                        print ("2")
+                        print("2")
                         if sqliteconector is None:
                             print("Error: No se ha establecido conexión con la base de datos.")
                             return
@@ -42,12 +42,12 @@ def main():
                                 print(f"Se cargaron {len(empleados)} empleados correctamente")
                             cargados_txt = True
                         except Exception as e:
-                                print(f"Error al insertar documentos: {e}")
+                            print(f"Error al insertar documentos: {e}")
                     else:
                         print("Opción no válida.")
 
                 case "3":
-                    print ("3")
+                    print("3")
                     if sqliteconector is None:
                         print("Error: No se ha establecido conexión con la base de datos.")
                         return
@@ -61,7 +61,7 @@ def main():
                         else:
                             [print(f'{i}\n') for i in empleados]
                     except Exception as e:
-                            print(f"Error al recuperar documentos: {e}")
+                        print(f"Error al recuperar documentos: {e}")
 
                 case "4":
                     print("4")
@@ -131,79 +131,103 @@ def main():
                         print(f"Error al insertar la oficina: {e}")
 
                 case "8":
-                    # Encontrar el mejor restaurante de cada distrito según su puntuación media.
-                    print ("8")
-                    if conexion is None:
+                    print("8")
+                    if sqliteconector is None:
                         print("Error: No se ha establecido conexión con la base de datos.")
                         return
-
                     try:
-                        pipeline = [
-                            {"$unwind": "$notas"},
-                            {"$match": {"notas.puntuacion": {"$exists": True, "$ne": None}}},
-                            {"$addFields": {
-                                "notas.puntuacion": {
-                                    "$convert": {
-                                        "input": "$notas.puntuacion",
-                                        "to": "double",
-                                        "onError": 0,
-                                        "onNull": 0
-                                    }
-                                }
-                            }},
-                            {"$group": {
-                                "_id": {"nombre": "$nombre", "distrito": "$distrito"},
-                                "calificacion_promedio": {"$avg": "$notas.puntuacion"}
-                            }},
-                            {"$sort": {"_id.distrito": 1, "calificacion_promedio": -1}},
-                            {"$group": {
-                                "_id": "$_id.distrito",
-                                "mejor_restaurante": {"$first": "$_id.nombre"},
-                                "puntuacion": {"$first": "$calificacion_promedio"}
-                            }},
-                            {"$project": {
-                                "_id": 0,
-                                "distrito": "$_id",
-                                "nombre": "$mejor_restaurante",
-                                "puntuacion": {"$round": ["$puntuacion", 2]}
-                            }},
-                            {"$sort": {"distrito": 1}}
-                        ]
+                        oficina_actual = input('Empleados de la oficina\n')
+                        oficina_futura = input('Oficina nueva para estos empleados\n')
+                        antes, despues = sqliteconector.cambiar_oficina(oficina_actual, oficina_futura)
 
-                        mejores_restaurantes = conexion.obtenerMejoresRestaurantesPorDistrito(nombreColeccion, pipeline)
-                        if mejores_restaurantes:
-                            print("Mejor restaurante por distrito:")
-                            for restaurante in mejores_restaurantes:
-                                print(f"- Distrito: {restaurante['distrito']}, Restaurante: {restaurante['nombre']} ({restaurante['puntuacion']:.2f})")
+                        print("\n=== ANTES DEL CAMBIO ===")
+                        for emp in antes:
+                            print(emp)
+
+                        print("\n=== DESPUÉS DEL CAMBIO ===")
+                        for emp in despues:
+                            print(emp)
+
+                        print("\nOficinas cambiada correctamente")
+                    except Exception as e:
+                        print(f"Error al cambiar la oficina: {e}")
+
+                case "9":
+                    print("9")
+                    if sqliteconector is None:
+                        print("Error: No se ha establecido conexión con la base de datos.")
+                        return
+                    try:
+                        print("=" * 60)
+                        print("Empleados de la oficina con mayor superficie")
+                        print("=" * 60)
+                        empleados = sqliteconector.consultar_empleados_oficina_mayor_superficie()
+                        if not empleados:
+                            print("No se ha encontrado empleados")
                         else:
-                            print("No se encontraron datos.")
+                            for emp in empleados:
+                                print(f"ID: {emp[0]}, Nombre: {emp[1]}, Fecha Nac: {emp[2]}, "
+                                      f"Oficina: {emp[3]}, Puesto: {emp[4]}, Contrato: {emp[5]}")
+                                print(f"Domicilio oficina: {emp[6]}, Superficie: {emp[7]} m²\n")
                     except Exception as e:
                         print(f"Error al recuperar documentos: {e}")
 
-                case "9":
-                    # Borrar todos los documentos siempre que se haya establecido la conexión con la base de datos.
-                    print ("9")
-                    if conexion is None:
-                        print("Error: No se ha establecido conexión con la base de datos.")
-                        return
-                    try:
-                        documentos_eliminados = conexion.borrarDocumentosColeccion(nombreColeccion)
-                        print(f"Se han eliminado {documentos_eliminados} documentos.")
-                    except Exception as e:
-                        print(f"Error al borrar los documentos: {e}")
                 case "10":
-                    # Cerrar conexión siempre que se haya establecido la misma anteriormente.
-                    print ("10")
-                    if conexion is None:
+                    print("10")
+                    if sqliteconector is None:
                         print("Error: No se ha establecido conexión con la base de datos.")
                         return
                     try:
-                        conexion.cerrarConexion()
+                        id_empleado = input('Introduce el ID del empleado a borrar\n')
+                        confirmacion = input(f'¿Estás seguro de borrar el empleado con ID {id_empleado}? (s/n)\n')
+                        if confirmacion.lower() == 's':
+                            if sqliteconector.borrar_empleado(id_empleado):
+                                print("Empleado borrado correctamente")
+                            else:
+                                print("No se pudo borrar el empleado")
+                        else:
+                            print("Operación cancelada")
                     except Exception as e:
-                            print(f"Error al cerrar la conexión: {e}")
+                        print(f"Error al borrar el empleado: {e}")
+
+                case "11":
+                    print("11")
+                    if sqliteconector is None:
+                        print("Error: No se ha establecido conexión con la base de datos.")
+                        return
+                    try:
+                        superficie_min = input('Introduce la superficie mínima\n')
+                        print("=" * 60)
+                        print(f"Oficinas con superficie superior a {superficie_min} m²")
+                        print("=" * 60)
+                        oficinas = sqliteconector.consultar_oficinas_por_superficie(superficie_min)
+                        if not oficinas:
+                            print("No se ha encontrado oficinas con esa superficie")
+                        else:
+                            [print(f'{i}\n') for i in oficinas]
+                    except Exception as e:
+                        print(f"Error al recuperar documentos: {e}")
+
+                case "12":
+                    print("12")
+                    if sqliteconector is None:
+                        print("Error: No se ha establecido conexión con la base de datos.")
+                        return
+                    try:
+                        id_oficina = input('Introduce el ID de la oficina\n')
+                        calle = input('Introduce la nueva calle\n')
+                        ciudad = input('Introduce la nueva ciudad\n')
+                        nuevo_domicilio = f"{calle}, {ciudad}"
+
+                        if sqliteconector.modificar_domicilio_oficina(id_oficina, nuevo_domicilio):
+                            print("Domicilio modificado correctamente")
+                        else:
+                            print("No se pudo modificar el domicilio")
+                    except Exception as e:
+                        print(f"Error al modificar el domicilio: {e}")
 
                 case _:
-                     print("Opción no válida, intenta de nuevo.")
+                    print("Opción no válida, intenta de nuevo.")
 
     except Exception as e:
         print(f"Error inesperado: {e}")
@@ -212,7 +236,7 @@ def main():
         if sqliteconector is not None:
             sqliteconector.cerrar_conexion()
         utils.borrar_base_datos()
-        
+
 
 if __name__ == "__main__":
-    main()    
+    main()
