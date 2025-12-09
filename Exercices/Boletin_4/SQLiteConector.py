@@ -136,20 +136,17 @@ class SQLiteConector:
             return [], []
 
         try:
-            # Consultar empleados antes del cambio
             self.cursor.execute('''
                 SELECT * FROM empleados WHERE oficina = ?
             ''', (oficina_actual,))
             antes = self.cursor.fetchall()
 
-            # Realizar el cambio
             self.cursor.execute('''
                 UPDATE empleados SET oficina = ? WHERE oficina = ?
             ''', (oficina_nueva, oficina_actual))
 
             self.conexion.commit()
 
-            # Consultar empleados después del cambio
             self.cursor.execute('''
                 SELECT * FROM empleados WHERE oficina = ?
             ''', (oficina_nueva,))
@@ -187,7 +184,6 @@ class SQLiteConector:
             return False
 
         try:
-            # Verificar si existe el empleado
             self.cursor.execute('SELECT * FROM empleados WHERE id_emp = ?', (id_empleado,))
             empleado = self.cursor.fetchone()
 
@@ -227,7 +223,6 @@ class SQLiteConector:
             return False
 
         try:
-            # Verificar si existe la oficina
             self.cursor.execute('SELECT * FROM oficinas WHERE id_ofi = ?', (id_oficina,))
             oficina = self.cursor.fetchone()
 
@@ -235,7 +230,6 @@ class SQLiteConector:
                 print(f"No existe una oficina con ID {id_oficina}")
                 return False
 
-            # Actualizar el domicilio
             self.cursor.execute('''
                 UPDATE oficinas SET domicilio = ? WHERE id_ofi = ?
             ''', (nuevo_domicilio, id_oficina))

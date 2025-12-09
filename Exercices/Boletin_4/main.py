@@ -19,10 +19,13 @@ def main():
                     continuar = False
 
                 case "1":
-                    print("1")
-                    sqliteconector = SQLiteConector()
-                    sqliteconector.crear_bd()
-                    print(sqliteconector)
+                    if not cargados_txt:
+                        print("1")
+                        sqliteconector = SQLiteConector()
+                        sqliteconector.crear_bd()
+                        print(sqliteconector)
+                    else:
+                        print("Opción no válida.")
 
                 case "2":
                     if not cargados_txt:

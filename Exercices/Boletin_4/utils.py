@@ -5,8 +5,8 @@ def mostrarMenu(cargados_txt: bool):
     print("MENÚ DE GESTIÓN DE EMPRESA")
     print("=" * 60)
     print("0 - Salir")
-    print("1 - Crear la base de datos Empresa con SQLite")
     if not cargados_txt:
+        print("1 - Crear la base de datos Empresa con SQLite")
         print("2 - Cargar datos desde fichero empleados.txt")
     print("3 - Mostrar todos los empleados")
     print("4 - Mostrar oficinas de una ciudad determinada")
