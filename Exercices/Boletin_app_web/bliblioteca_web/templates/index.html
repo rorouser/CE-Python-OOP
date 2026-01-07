@@ -10,7 +10,19 @@
         <h1>{{nombre}}</h1>
         <p class="subtitle">Sistema de Gestión de Libros</p>
     </header>
-        <div class="books-section">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <span>{{ message }}</span>
+                        <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    <div class="books-section">
             <div class="section-header">
                 <h2>Catálogo de Libros</h2>
                 <a href="/agregar" class="btn btn-small btn-primary" title="Agregar libro">Agregar libro</a>

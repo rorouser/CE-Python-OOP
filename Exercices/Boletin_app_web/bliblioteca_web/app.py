@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 import os
 
 from biblioteca import Biblioteca, Libro
 import repository as rp
 
 app = Flask(__name__)
+app.secret_key = '1234567890'
 port = int(os.environ.get('PORT', 5001))
 
 libros: list[Libro] = []
@@ -22,25 +23,48 @@ rp.crear_tabla()
 def index():
     global biblioteca
     biblioteca = rp.mostrar_libros()
-    return render_template('index.html', libros=biblioteca._Biblioteca__libros, nombre=biblioteca._Biblioteca__nombre)
+    return render_template('index.html',
+                           libros=biblioteca._Biblioteca__libros,
+                           nombre=biblioteca._Biblioteca__nombre)
 
 
 @app.route('/prestar/<isbn>')
 def prestar(isbn):
     global biblioteca
-    biblioteca.prestar_libro(isbn)
-    rp.guardar_libros(biblioteca)
+    libro_encontrado = None
+    for libro in biblioteca._Biblioteca__libros:
+        if libro.isbn == isbn:
+            libro_encontrado = libro
+            break
+
+    if libro_encontrado:
+        if libro_encontrado.disponible:
+            libro_encontrado.prestar()
+            rp.guardar_libros(biblioteca)
+            flash(f'Libro "{libro_encontrado.titulo}" prestado con éxito', 'success')
+        else:
+            flash(f'El libro "{libro_encontrado.titulo}" ya está prestado', 'error')
+    else:
+        flash('Libro no encontrado', 'error')
+
     return redirect(url_for('index'))
 
 
 @app.route('/devolver/<isbn>')
 def devolver(isbn):
     global biblioteca
+    libro_encontrado = None
     for libro in biblioteca._Biblioteca__libros:
         if libro.isbn == isbn:
+            libro_encontrado = libro
             libro.devolver()
             rp.guardar_libros(biblioteca)
+            flash(f'Libro "{libro.titulo}" devuelto con éxito', 'success')
             break
+
+    if not libro_encontrado:
+        flash('Libro no encontrado', 'error')
+
     return redirect(url_for('index'))
 
 
@@ -51,6 +75,20 @@ def agregar():
         titulo = request.form.get('titulo')
         autor = request.form.get('autor')
         isbn = request.form.get('isbn')
+
+        if not titulo or not autor or not isbn:
+            flash('Todos los campos son obligatorios', 'error')
+            return redirect(url_for('agregar'))
+
+        for libro in biblioteca._Biblioteca__libros:
+            if libro.isbn == isbn:
+                flash(f'Ya existe un libro con el ISBN {isbn}', 'error')
+                return redirect(url_for('agregar'))
+
+        nuevo_libro = Libro(titulo, autor, isbn)
+        biblioteca.agregar_libro(nuevo_libro)
+        rp.guardar_libros(biblioteca)
+        flash(f'Libro "{titulo}" agregado con éxito', 'success')
 
         if titulo and autor and isbn:
             nuevo_libro = Libro(titulo, autor, isbn)
