@@ -58,15 +58,12 @@
                                 {% endif %}
                             </td>
                             <td data-label="Acciones" class="actions">
-                                {% if libro.disponible %}
                                 <a href="/prestar/{{libro.isbn}}" class="btn btn-small btn-success">
                                     Prestar
                                 </a>
-                                {% else %}
                                 <a href="/devolver/{{libro.isbn}}" class="btn btn-small btn-warning">
                                     Devolver
                                 </a>
-                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}

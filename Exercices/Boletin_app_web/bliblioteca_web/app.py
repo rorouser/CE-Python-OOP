@@ -11,9 +11,11 @@ port = int(os.environ.get('PORT', 5001))
 libros: list[Libro] = []
 biblioteca = Biblioteca('Biblioteca Central', libros)
 
-# biblioteca.agregar_libro(Libro("Dracula", "Bram Stocker", "2938234567"))
-# biblioteca.agregar_libro(Libro("El niño con el pijama de rayas", "John Boyne", "7891234567"))
-# biblioteca.agregar_libro(Libro("Oliver Twist", "Charles Dickens", "5618273456"))
+# biblioteca.agregar_libro(Libro("Dracula", "Bram Stocker", "9786665032297"))
+# biblioteca.agregar_libro(Libro("El niño con el pijama de rayas", "John Boyne", "9789875761921"))
+# biblioteca.agregar_libro(Libro("Oliver Twist", "Charles Dickens", "9789875503230"))
+# biblioteca.agregar_libro(Libro("Oliver Twist", "Miguel de Cervantes", "9789875543536"))
+# biblioteca.agregar_libro(Libro("El retrato de Dorian Gray", "Oscar Wilde", "9789875503229"))
 
 rp.crear_tabla()
 # rp.guardar_libros(biblioteca)
@@ -57,9 +59,12 @@ def devolver(isbn):
     for libro in biblioteca._Biblioteca__libros:
         if libro.isbn == isbn:
             libro_encontrado = libro
-            libro.devolver()
-            rp.guardar_libros(biblioteca)
-            flash(f'Libro "{libro.titulo}" devuelto con éxito', 'success')
+            if not libro.disponible:
+                libro.devolver()
+                rp.guardar_libros(biblioteca)
+                flash(f'Libro "{libro.titulo}" devuelto con éxito', 'success')
+            else:
+                flash(f'El libro "{libro.titulo}" ya está devuelto', 'error')
             break
 
     if not libro_encontrado:
