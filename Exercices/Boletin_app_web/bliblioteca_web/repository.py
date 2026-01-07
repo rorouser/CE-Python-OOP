@@ -39,21 +39,22 @@ def guardar_libros(biblioteca: Biblioteca):
     conn.close()
     print(f"\n{len(libros)} libros guardados en la base de datos.")
 
-
-def mostrar_libros_desde_bd():
-    """Muestra los libros de la base de datos"""
+def mostrar_libros():
+    """Devuelve los libros de la base de datos"""
     conn = sqlite3.connect('biblioteca.db')
     cursor = conn.cursor()
 
     cursor.execute('SELECT isbn, titulo, autor, disponible FROM libros')
     registros = cursor.fetchall()
 
-    print("\n=== Libros en la Base de Datos ===")
-    if not registros:
-        print("No hay libros en la base de datos.")
-    else:
-        for isbn, titulo, autor, disponible in registros:
-            estado = "Disponible" if disponible else "Prestado"
-            print(f"'{titulo}' - Autor: {autor}, ISBN: {isbn}, Estado: {estado}")
+    libros = []
+    for isbn, titulo, autor, disponible in registros:
+        libro = Libro(titulo, autor, isbn)
+        if not disponible:
+            libro.prestar()
+        libros.append(libro)
 
     conn.close()
+
+    biblioteca = Biblioteca("Mi Biblioteca", libros)
+    return biblioteca

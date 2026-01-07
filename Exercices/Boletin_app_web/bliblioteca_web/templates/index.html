@@ -1,37 +1,71 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<title>Document</title>
+<title>Biblioteca - {{nombre}}</title>
 {% endblock %}
 
 {% block body %}
-<div class="content">
-    <h1>Library</h1>
-    {% if tasks | length < 1 %}
-    <h3>There are no books... Create one here!</h3>
-    {% else %}
-    <table>
-        <tr>
-            <th>Book</th>
-            <th>Added</th>
-            <th>Actions</th>
-        </tr>
-        {% for libro in libros %}
-        <tr>
-            <td>{{task.content}}</td>
-            <td>{{task.created.strftime("%Y-%m-%d")}}</td>
-            <td>
-                <a href="/prestar/{{libro.isbn}}">Delete</a>
-                <br/>
-                <a href="/devolver/{{libro.isbn}}">Edit</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-    {% endif %}
-    <form action="/" method="POST">
-        <input type="text" name="content" id="content"/>
-        <input type="submit" value="Add Task" id="btn_add"/>
-    </form>
+<div class="container">
+    <header class="header">
+        <h1>{{nombre}}</h1>
+        <p class="subtitle">Sistema de Gestión de Libros</p>
+    </header>
+        <div class="books-section">
+            <div class="section-header">
+                <h2>Catálogo de Libros</h2>
+                <a href="/agregar" class="btn btn-small btn-primary" title="Agregar libro">Agregar libro</a>
+            </div>
+            {% if libros | length < 1 %}
+            <div class="empty-state">
+                <h3>No hay libros en la biblioteca</h3>
+                <p>Agrega tu primer libro usando el botón de arriba</p>
+            </div>
+            {% else %}
+            <div class="table-container">
+                <table class="books-table">
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Autor</th>
+                            <th>ISBN</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for libro in libros %}
+                        <tr>
+                            <td data-label="Título" class="book-title">{{libro.titulo}}</td>
+                            <td data-label="Autor">{{libro.autor}}</td>
+                            <td data-label="ISBN" class="isbn">{{libro.isbn}}</td>
+                            <td data-label="Estado">
+                                {% if libro.disponible %}
+                                <span class="badge badge-success">✓ Disponible</span>
+                                {% else %}
+                                <span class="badge badge-danger">✗ No disponible</span>
+                                {% endif %}
+                            </td>
+                            <td data-label="Acciones" class="actions">
+                                {% if libro.disponible %}
+                                <a href="/prestar/{{libro.isbn}}" class="btn btn-small btn-success">
+                                    Prestar
+                                </a>
+                                {% else %}
+                                <a href="/devolver/{{libro.isbn}}" class="btn btn-small btn-warning">
+                                    Devolver
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="stats">
+                <p>Total de libros: <strong>{{libros | length}}</strong></p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
 {% endblock %}
