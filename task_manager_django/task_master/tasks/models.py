@@ -48,7 +48,8 @@ class Project(models.Model):
             'todo': todo_tasks,
             'in_progress': in_progress_tasks,
             'done_percentage': (done_tasks / total_tasks * 100) if total_tasks > 0 else 0,
-            'pending_percentage': ((total_tasks - done_tasks) / total_tasks * 100) if total_tasks > 0 else 0
+            'pending_percentage': ((total_tasks - done_tasks) / total_tasks * 100) if total_tasks > 0 else 0,
+            'pending': total_tasks - done_tasks - in_progress_tasks,
         }
 
 

@@ -1,0 +1,30 @@
+body {
+    min-height: 100vh;
+    background: #1a1a1a;
+}
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+.card {
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+.card {
+}
+
+.card-body {
+    background-color: #f8f9fa;
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+.project-card {
+    border-left: 4px solid #667eea;
+}
+.collaboration-card {
+    border-left: 4px solid #764ba2;
+}
+.task-badge {
+    font-size: 0.75rem;
+}
