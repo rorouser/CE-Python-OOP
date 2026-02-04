@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>User Management</title>
+<link rel="stylesheet" href="{{ url_for('static', path='/styles.css')
+}}">
+</head>
+<body>
+<div class="app-container">
+<header>
+<h1>Dashboard de Usuarios</h1>
+<button id="refresh-btn">Actualizar Lista</button>
+</header>
+<div class="card" style="margin-bottom: 30px;">
+<h2>Añadir Nuevo Usuario</h2>
+<form id="userForm">
+<div style="display: flex; gap: 10px; margin-bottom: 10px;">
+<input type="text" id="firstName" placeholder="Nombre"
+required
+style="flex:1; padding: 10px; border-radius: 5px;
+border: 1px solid #ddd;">
+<input type="text" id="lastName" placeholder="Apellido"
+required
+style="flex:1; padding: 10px; border-radius: 5px;
+        border: 1px solid #ddd;">
+</div>
+<div style="display: flex; gap: 10px; margin-bottom: 15px;">
+<select id="gender" required style="flex:1; padding:
+10px; border-radius: 5px; border: 1px solid #ddd;">
+<option value="male">Masculino</option>
+<option value="female">Femenino</option>
+</select>
+<select id="role" required style="flex:1; padding: 10px;
+border-radius: 5px; border: 1px solid #ddd;">
+<option value="user">User</option>
+<option value="admin">Admin</option>
+<option value="student">Student</option>
+</select>
+</div>
+<button type="submit" id="submit-btn"
+style="width: 100%; background: #00d1b2; color:
+white; border: none; padding: 12px; border-radius: 5px; cursor: pointer;
+font-weight: bold;">
+Guardar Usuario
+</button>
+</form>
+</div>
+<div class="table-card">
+<table id="userTable">
+<thead>
+<tr>
+<th>Nombre</th>
+<th>Género</th>
+<th>Roles</th>
+</tr>
+</thead>
+<tbody id="userBody">
+</tbody>
+</table>
+</div>
+</div>
+<script src="{{ url_for('static', path='/scripts.js') }}"></script>
+</body>
+</html>

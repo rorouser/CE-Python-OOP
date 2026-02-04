@@ -1,0 +1,5 @@
+pip install fastapi
+pip3 install "uvicorn[standard]"
+
+uvicorn main:app --reload --> (main es el nombre del archivo python y app es el nombre de la instancia de FastAPI, --reload es para que se reinicie el servidor cada vez que se haga un cambio en el código).
+
