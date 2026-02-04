@@ -12,16 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 from decouple import config, Csv
-from dotenv import load_dotenv
 import os
-
-ENVIRONMENT = os.getenv('ENVIRONMENT', 'development')
-
-if ENVIRONMENT == 'production':
-    load_dotenv('prod.env')
-else:
-    load_dotenv('dev.env')
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -34,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config(
     'ALLOWED_HOSTS',
@@ -102,9 +93,9 @@ DATABASES = {
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT', default='3306'),
+        'PORT': config('DB_PORT', default='25022'),
         'OPTIONS': {
-            'ssl': {}
+            'ssl': {'ssl-mode': 'preferred'}
         }
     }
 }
