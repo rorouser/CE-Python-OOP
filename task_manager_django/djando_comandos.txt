@@ -1,0 +1,17 @@
+mkdir task_master
+py -3.12 -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install django==4.2.11
+pip install python-decouple
+pip install pymysql
+pip install faker
+pip install whitenoise
+
+django-admin startproject app task_master
+python manage.py runserver
+python manage.py startapp tasksdb
+python manage.py makemigrations tasks
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
