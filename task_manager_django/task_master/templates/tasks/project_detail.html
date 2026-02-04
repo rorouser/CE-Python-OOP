@@ -1,0 +1,288 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.title }} - TaskMaster{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">
+                        <i class="bi bi-folder"></i> {{ project.title }}
+                    </h2>
+                    {% if is_owner %}
+                        <div>
+                            <a href="{% url 'project_update' project.pk %}" class="btn btn-light btn-sm">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            <a href="{% url 'project_delete' project.pk %}" class="btn btn-danger btn-sm">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <p class="lead">{{ project.description }}</p>
+                
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <p><strong><i class="bi bi-person"></i> Propietario:</strong> {{ project.owner.username }}</p>
+                        <p><strong><i class="bi bi-calendar-event"></i> Fecha límite:</strong> {{ project.deadline|date:"d/m/Y" }}</p>
+                        <p><strong><i class="bi bi-clock"></i> Creado:</strong> {{ project.created_at|date:"d/m/Y H:i" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        {% if project.collaborators.all %}
+                            <p><strong><i class="bi bi-people"></i> Colaboradores:</strong></p>
+                            <ul>
+                                {% for collaborator in project.collaborators.all %}
+                                    <li>{{ collaborator.username }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráfico de Estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Progreso del Proyecto</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="taskChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Estadísticas</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-3">
+                        <h3 class="text-secondary">{{ stats.total }}</h3>
+                        <p class="text-muted">Total</p>
+                    </div>
+                    <div class="col-3">
+                        <h3 class="text-success">{{ stats.done }}</h3>
+                        <p class="text-muted">Completadas</p>
+                    </div>
+                    <div class="col-3">
+                        <h3 class="text-primary">{{ stats.in_progress }}</h3>
+                        <p class="text-muted">En Progreso</p>
+                    </div>
+                    <div class="col-3">
+                        <h3 class="text-warning">{{ stats.pending }}</h3>
+                        <p class="text-muted">Pendientes</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="progress" style="height: 25px;">
+                    <div class="progress-bar bg-success" role="progressbar" 
+                         style="width: {{ stats.done_percentage }}%"
+                         aria-valuenow="{{ stats.done_percentage }}" 
+                         aria-valuemin="0" aria-valuemax="100">
+                        {{ stats.done_percentage|floatformat:0 }}%
+                    </div>
+                </div>
+                <p class="text-center mt-2 text-muted">Porcentaje completado</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tareas -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-list-task"></i> Tareas</h5>
+                    <a href="{% url 'task_create' project.pk %}" class="btn btn-light btn-sm">
+                        <i class="bi bi-plus-circle"></i> Nueva Tarea
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <h6 class="text-warning"><i class="bi bi-circle"></i> Pendientes</h6>
+                {% if todo_tasks %}
+                    <div class="list-group mb-4">
+                        {% for task in todo_tasks %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">{{ task.title }}</h6>
+                                        {% if task.description %}
+                                            <p class="mb-1 small text-muted">{{ task.description|truncatewords:20 }}</p>
+                                        {% endif %}
+                                        <small>
+                                            <span class="badge bg-{{ task.get_priority_display_color }}">
+                                                {{ task.get_priority_display }}
+                                            </span>
+                                            {% if task.assigned_to %}
+                                                <span class="badge bg-info">
+                                                    <i class="bi bi-person"></i> {{ task.assigned_to.username }}
+                                                </span>
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'task_update' task.pk %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        {% if is_owner %}
+                                            <a href="{% url 'task_delete' task.pk %}" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No hay tareas pendientes.</p>
+                {% endif %}
+
+                <h6 class="text-primary"><i class="bi bi-arrow-repeat"></i> En Progreso</h6>
+                {% if inprogress_tasks %}
+                    <div class="list-group mb-4">
+                        {% for task in inprogress_tasks %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">{{ task.title }}</h6>
+                                        {% if task.description %}
+                                            <p class="mb-1 small text-muted">{{ task.description|truncatewords:20 }}</p>
+                                        {% endif %}
+                                        <small>
+                                            <span class="badge bg-{{ task.get_priority_display_color }}">
+                                                {{ task.get_priority_display }}
+                                            </span>
+                                            {% if task.assigned_to %}
+                                                <span class="badge bg-info">
+                                                    <i class="bi bi-person"></i> {{ task.assigned_to.username }}
+                                                </span>
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'task_update' task.pk %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        {% if is_owner %}
+                                            <a href="{% url 'task_delete' task.pk %}" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No hay tareas en progreso.</p>
+                {% endif %}
+
+                <h6 class="text-success"><i class="bi bi-check-circle"></i> Completadas</h6>
+                {% if done_tasks %}
+                    <div class="list-group mb-4">
+                        {% for task in done_tasks %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1"><del>{{ task.title }}</del></h6>
+                                        {% if task.description %}
+                                            <p class="mb-1 small text-muted">{{ task.description|truncatewords:20 }}</p>
+                                        {% endif %}
+                                        <small>
+                                            <span class="badge bg-{{ task.get_priority_display_color }}">
+                                                {{ task.get_priority_display }}
+                                            </span>
+                                            {% if task.assigned_to %}
+                                                <span class="badge bg-info">
+                                                    <i class="bi bi-person"></i> {{ task.assigned_to.username }}
+                                                </span>
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'task_update' task.pk %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        {% if is_owner %}
+                                            <a href="{% url 'task_delete' task.pk %}" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No hay tareas completadas.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver al Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    const ctx = document.getElementById('taskChart');
+    
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Completadas', 'Pendientes', 'En progreso'],
+            datasets: [{
+                label: 'Tareas',
+                data: [{{ stats.done }}, {{ stats.pending }}, {{ stats.in_progress }}],
+                backgroundColor: [
+                    'rgba(40, 167, 69, 0.8)',
+                    'rgba(255, 193, 7, 0.8)',
+                    'rgba(13, 110, 253, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(40, 167, 69, 1)',
+                    'rgba(255, 193, 7, 1)',
+                    'rgba(13, 110, 253, 1)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                title: {
+                    display: true,
+                    text: 'Distribución de Tareas'
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

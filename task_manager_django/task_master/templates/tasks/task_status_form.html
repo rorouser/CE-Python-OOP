@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Actualizar Estado - TaskMaster{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-warning text-dark">
+                <h3 class="mb-0">
+                    <i class="bi bi-arrow-repeat"></i> Actualizar Estado
+                </h3>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    Como colaborador, puedes cambiar el estado de las tareas.
+                    Solo el propietario puede editar otros campos.
+                </div>
+                
+                <h5 class="mb-3">Tarea: {{ task.title }}</h5>
+                <p class="text-muted">Proyecto: {{ project.title }}</p>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.status.id_for_label }}" class="form-label">
+                            Nuevo Estado *
+                        </label>
+                        {{ form.status }}
+                        {% if form.status.errors %}
+                            <div class="text-danger">{{ form.status.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-save"></i> Actualizar
+                        </button>
+                        <a href="{% url 'project_detail' project.pk %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

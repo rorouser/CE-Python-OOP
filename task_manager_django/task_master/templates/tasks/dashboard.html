@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - TaskMaster{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="text-white">
+            <i class="bi bi-speedometer2"></i> Mi Dashboard
+        </h1>
+        <p class="text-white-50">Bienvenido, {{ user.username }}</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="text-white">
+                <i class="bi bi-folder"></i> Mis Proyectos
+            </h2>
+            <a href="{% url 'project_create' %}" class="btn btn-light">
+                <i class="bi bi-plus-circle"></i> Nuevo Proyecto
+            </a>
+        </div>
+        
+        {% if owned_projects %}
+            <div class="row">
+                {% for project in owned_projects %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card project-card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="{% url 'project_detail' project.pk %}" class="text-decoration-none">
+                                        {{ project.title }}
+                                    </a>
+                                </h5>
+                                <p class="card-text text-muted small">
+                                    {{ project.description|truncatewords:15 }}
+                                </p>
+                                
+                                <div class="mb-2">
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar-event"></i> 
+                                        Vence: {{ project.deadline|date:"d/m/Y" }}
+                                    </small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <span class="badge bg-primary task-badge">
+                                        <i class="bi bi-list-task"></i> {{ project.task_count }} tareas
+                                    </span>
+                                    <span class="badge bg-success task-badge">
+                                        <i class="bi bi-check-circle"></i> {{ project.done_count }} completadas
+                                    </span>
+                                </div>
+                                
+                                {% if project.collaborators.count > 0 %}
+                                    <div class="mb-2">
+                                        <small class="text-muted">
+                                            <i class="bi bi-people"></i> 
+                                            {{ project.collaborators.count }} colaborador{{ project.collaborators.count|pluralize:"es" }}
+                                        </small>
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'project_detail' project.pk %}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-eye"></i> Ver
+                                    </a>
+                                    <a href="{% url 'project_update' project.pk %}" class="btn btn-sm btn-warning">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-folder-plus" style="font-size: 3rem; color: #ccc;"></i>
+                    <p class="text-muted mt-3">No tienes proyectos creados.</p>
+                    <a href="{% url 'project_create' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Crear tu primer proyecto
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <h2 class="text-white mb-3">
+            <i class="bi bi-people"></i> Colaboraciones
+        </h2>
+        
+        {% if collaborated_projects %}
+            <div class="row">
+                {% for project in collaborated_projects %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card collaboration-card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="{% url 'project_detail' project.pk %}" class="text-decoration-none">
+                                        {{ project.title }}
+                                    </a>
+                                </h5>
+                                <p class="card-text text-muted small">
+                                    {{ project.description|truncatewords:15 }}
+                                </p>
+                                
+                                <div class="mb-2">
+                                    <small class="text-muted">
+                                        <i class="bi bi-person"></i> 
+                                        Propietario: {{ project.owner.username }}
+                                    </small>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar-event"></i> 
+                                        Vence: {{ project.deadline|date:"d/m/Y" }}
+                                    </small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <span class="badge bg-primary task-badge">
+                                        <i class="bi bi-list-task"></i> {{ project.task_count }} tareas
+                                    </span>
+                                    <span class="badge bg-success task-badge">
+                                        <i class="bi bi-check-circle"></i> {{ project.done_count }} completadas
+                                    </span>
+                                </div>
+                                
+                                <a href="{% url 'project_detail' project.pk %}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-eye"></i> Ver Proyecto
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-people" style="font-size: 3rem; color: #ccc;"></i>
+                    <p class="text-muted mt-3">No estás colaborando en ningún proyecto actualmente.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
