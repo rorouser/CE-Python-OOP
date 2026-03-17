@@ -33,5 +33,6 @@ class Scooter(Base):
     estado = Column(Enum(ScooterStatus), nullable=False, default=ScooterStatus.disponible)
     zona_id = Column(Integer, ForeignKey("zones.id"), nullable=False)
 
+    puntuacion_usuario = Column(Float, nullable=True)
 
     zona = relationship("Zone", back_populates="patinetes")
