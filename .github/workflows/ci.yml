@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'dev_ops/**'        # Solo se dispara si cambias algo en dev_ops
+      - 'dev_ops/**'
   pull_request:
     branches: [main]
     paths:
@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: dev_ops   # Todos los `run` se ejecutan desde aquí
+        working-directory: dev_ops
 
     services:
       postgres:
