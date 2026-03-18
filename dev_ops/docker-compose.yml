@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+
+  # ── Base de datos PostgreSQL ────────────────────────────────────────────────
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: scooter
+      POSTGRES_PASSWORD: scooter
+      POSTGRES_DB: scooterflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # Healthcheck nativo de Docker: la API esperará hasta que la DB esté lista
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scooter -d scooterflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── API FastAPI ────────────────────────────────────────────────────────────
+  api:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://scooter:scooter@db:5432/scooterflow
+    depends_on:
+      db:
+        condition: service_healthy   # <── La magia: espera a que la DB pase el healthcheck
+    volumes:
+      - .:/app                       # Hot-reload en desarrollo
+
+volumes:
+  postgres_data:

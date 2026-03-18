@@ -1,0 +1,58 @@
+name: CI – ScooterFlow Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Run pytest suite
+    runs-on: ubuntu-latest
+
+    # ── Servicio de Postgres para los tests ──────────────────────────────────
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: scooter
+          POSTGRES_PASSWORD: scooter
+          POSTGRES_DB: scooterflow_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U scooter -d scooterflow_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      # 1. Checkout del código
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Instalar Python
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      # 3. Instalar dependencias
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # 4. Ejecutar migraciones de Alembic contra la DB de prueba
+      - name: Run Alembic migrations
+        env:
+          DATABASE_URL: postgresql://scooter:scooter@localhost:5432/scooterflow_test
+        run: alembic upgrade head
+
+      # 5. Ejecutar tests
+      #    PYTHONPATH=. → permite que pytest encuentre el paquete `app`
+      - name: Run tests
+        env:
+          DATABASE_URL: postgresql://scooter:scooter@localhost:5432/scooterflow_test
+          PYTHONPATH: .
+        run: pytest tests/ -v --tb=short
