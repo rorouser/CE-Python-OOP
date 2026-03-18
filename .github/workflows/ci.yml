@@ -3,15 +3,21 @@ name: CI – ScooterFlow Tests
 on:
   push:
     branches: [main]
+    paths:
+      - 'dev_ops/**'        # Solo se dispara si cambias algo en dev_ops
   pull_request:
     branches: [main]
+    paths:
+      - 'dev_ops/**'
 
 jobs:
   test:
     name: Run pytest suite
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dev_ops   # Todos los `run` se ejecutan desde aquí
 
-    # ── Servicio de Postgres para los tests ──────────────────────────────────
     services:
       postgres:
         image: postgres:15-alpine
@@ -38,6 +44,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: "pip"
+          cache-dependency-path: dev_ops/requirements.txt
 
       # 3. Instalar dependencias
       - name: Install dependencies
