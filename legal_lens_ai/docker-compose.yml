@@ -1,0 +1,51 @@
+services:
+
+  db-legal:
+    image: postgres:16-alpine
+    container_name: legallens-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - legallens-net
+
+  backend-django:
+    build:
+      context: ./django_backend
+      dockerfile: Dockerfile
+    container_name: legallens-django
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./django_backend:/app
+      - django_media:/app/media
+      - django_static:/app/staticfiles
+    expose:
+      - "8000"
+    ports:
+      - "8010:8000"
+    depends_on:
+      db-legal:
+        condition: service_healthy
+    networks:
+      - legallens-net
+
+volumes:
+  postgres_data:
+  django_media:
+  django_static:
+
+networks:
+  legallens-net:
+    driver: bridge
