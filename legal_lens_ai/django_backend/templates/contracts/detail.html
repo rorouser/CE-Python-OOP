@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Contrato #{{ contract.id }} - LegalLens AI{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Contrato #{{ contract.id }} — {{ contract.client_name }}</h2>
+    <a href="{% url 'contracts:dashboard' %}" class="btn btn-outline-secondary btn-sm">← Volver</a>
+</div>
+
+<div class="row">
+    <div class="col-md-5">
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Información general</h5>
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Cliente</dt><dd class="col-sm-7">{{ contract.client_name }}</dd>
+                    <dt class="col-sm-5">Tipo</dt><dd class="col-sm-7">{{ contract.get_contract_type_display }}</dd>
+                    <dt class="col-sm-5">Fecha subida</dt><dd class="col-sm-7">{{ contract.uploaded_at|date:"d/m/Y H:i" }}</dd>
+                    <dt class="col-sm-5">Estado</dt>
+                    <dd class="col-sm-7">
+                        {% if contract.status == 'CLEAN' %}<span class="badge bg-success">Limpio</span>
+                        {% elif contract.status == 'FLAGGED' %}<span class="badge bg-danger">Banderas Rojas</span>
+                        {% elif contract.status == 'PROCESSING' %}<span class="badge bg-warning">Procesando</span>
+                        {% elif contract.status == 'PENDING' %}<span class="badge bg-secondary">Pendiente</span>
+                        {% elif contract.status == 'ERROR' %}<span class="badge bg-dark">Error</span>
+                        {% else %}<span class="badge bg-dark">{{ contract.get_status_display }}</span>
+                        {% endif %}
+                    </dd>
+                    <dt class="col-sm-5">Archivo</dt>
+                    <dd class="col-sm-7">
+                        {% if contract.pdf_file %}
+                            <a href="{{ contract.pdf_file.url }}" target="_blank">Ver PDF</a>
+                        {% else %}—{% endif %}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+        {% if report and report.key_data %}
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Datos clave extraídos</h5>
+                <table class="table table-sm mb-0">
+                    <tbody>
+                    {% for k, v in report.key_data.items %}
+                        <tr><th class="text-capitalize">{{ k }}</th><td>{{ v }}</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-7">
+        {% if report %}
+            {% if report.summary %}
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Resumen ejecutivo</h5>
+                    <p class="mb-0">{{ report.summary }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-danger text-white">
+                    <strong>🚩 Banderas rojas detectadas ({{ report.red_flags|length }})</strong>
+                </div>
+                <div class="card-body">
+                    {% if report.red_flags %}
+                        {% for flag in report.red_flags %}
+                        <div class="border-start border-4 border-danger ps-3 mb-3">
+                            <h6 class="mb-1">
+                                {{ flag.clausula|default:"Cláusula" }}
+                                {% if flag.severidad %}
+                                    <span class="badge bg-{{ flag.severidad|lower }}">{{ flag.severidad }}</span>
+                                {% endif %}
+                            </h6>
+                            <p class="mb-1"><strong>Problema:</strong> {{ flag.problema }}</p>
+                            {% if flag.articulo_legal %}
+                                <p class="mb-0 small text-muted">Base legal: {{ flag.articulo_legal }}</p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-success mb-0">✓ No se detectaron cláusulas problemáticas.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if report.processing_time_ms %}
+                <p class="text-muted small">Procesado en {{ report.processing_time_ms }} ms</p>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info">
+                {% if contract.status == 'PENDING' %}
+                    El contrato está pendiente de auditoría. El microservicio de IA aún no está disponible (Semana 2-3).
+                {% elif contract.status == 'PROCESSING' %}
+                    Auditoría en curso… recarga en unos segundos.
+                {% else %}
+                    Aún no hay informe de auditoría disponible para este contrato.
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - LegalLens AI{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Mis Contratos</h2>
+    <a href="{% url 'contracts:upload' %}" class="btn btn-primary">+ Subir nuevo contrato</a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3"><div class="card text-center"><div class="card-body">
+        <h3>{{ stats.total }}</h3><small>Total</small>
+    </div></div></div>
+    <div class="col-md-3"><div class="card text-center text-success"><div class="card-body">
+        <h3>{{ stats.clean }}</h3><small>Limpios</small>
+    </div></div></div>
+    <div class="col-md-3"><div class="card text-center text-danger"><div class="card-body">
+        <h3>{{ stats.flagged }}</h3><small>Con banderas rojas</small>
+    </div></div></div>
+    <div class="col-md-3"><div class="card text-center text-warning"><div class="card-body">
+        <h3>{{ stats.pending }}</h3><small>Pendientes</small>
+    </div></div></div>
+</div>
+
+{% if contracts %}
+<table class="table table-hover bg-white shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>#</th><th>Cliente</th><th>Tipo</th><th>Fecha</th><th>Estado</th><th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in contracts %}
+        <tr>
+            <td>{{ c.id }}</td>
+            <td>{{ c.client_name }}</td>
+            <td>{{ c.get_contract_type_display }}</td>
+            <td>{{ c.uploaded_at|date:"d/m/Y H:i" }}</td>
+            <td>
+                {% if c.status == 'CLEAN' %}<span class="badge bg-success">Limpio</span>
+                {% elif c.status == 'FLAGGED' %}<span class="badge bg-danger">Banderas Rojas</span>
+                {% elif c.status == 'PROCESSING' %}<span class="badge bg-warning">Procesando</span>
+                {% elif c.status == 'PENDING' %}<span class="badge bg-secondary">Pendiente</span>
+                {% else %}<span class="badge bg-dark">{{ c.get_status_display }}</span>
+                {% endif %}
+            </td>
+            <td><a href="{% url 'contracts:detail' c.pk %}" class="btn btn-sm btn-outline-primary">Ver</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="alert alert-info">
+    Aun no has subido ningun contrato. <a href="{% url 'contracts:upload' %}">Sube el primero</a>.
+</div>
+{% endif %}
+{% endblock %}
