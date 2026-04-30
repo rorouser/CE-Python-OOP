@@ -38,6 +38,29 @@ services:
     depends_on:
       db-legal:
         condition: service_healthy
+      ai-engine:
+        condition: service_started
+    networks:
+      - legallens-net
+
+  ai-engine:
+    build:
+      context: ./fastapi_engine
+      dockerfile: Dockerfile
+    container_name: legallens-ai
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./fastapi_engine:/app
+    expose:
+      - "8001"
+    ports:
+      - "8011:8001"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8001/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - legallens-net
 
