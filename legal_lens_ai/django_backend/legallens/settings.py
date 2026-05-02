@@ -5,12 +5,9 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Cargar .env si existe (en local sin docker)
 load_dotenv(BASE_DIR.parent / ".env")
 
-# -----------------------------------------------------------------------------
-# Seguridad
-# -----------------------------------------------------------------------------
+
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-CHANGEME")
 DEBUG = os.environ.get("DJANGO_DEBUG", "0") == "1"
 ALLOWED_HOSTS = [
@@ -20,9 +17,7 @@ ALLOWED_HOSTS = [
     if h.strip()
 ]
 
-# -----------------------------------------------------------------------------
-# Aplicaciones
-# -----------------------------------------------------------------------------
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -66,9 +61,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "legallens.wsgi.application"
 
-# -----------------------------------------------------------------------------
-# Base de datos (PostgreSQL)
-# -----------------------------------------------------------------------------
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -80,9 +73,7 @@ DATABASES = {
     }
 }
 
-# -----------------------------------------------------------------------------
-# Validacion contraseñas
-# -----------------------------------------------------------------------------
+
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -90,17 +81,13 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# -----------------------------------------------------------------------------
-# i18n / tz
-# -----------------------------------------------------------------------------
+
 LANGUAGE_CODE = "es-es"
 TIME_ZONE = "Europe/Madrid"
 USE_I18N = True
 USE_TZ = True
 
-# -----------------------------------------------------------------------------
-# Estaticos y media
-# -----------------------------------------------------------------------------
+
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
@@ -108,25 +95,28 @@ STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# -----------------------------------------------------------------------------
-# Auth
-# -----------------------------------------------------------------------------
+
 LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "contracts:dashboard"
 LOGOUT_REDIRECT_URL = "accounts:login"
 
-# -----------------------------------------------------------------------------
-# Pks por defecto
-# -----------------------------------------------------------------------------
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# -----------------------------------------------------------------------------
-# FastAPI (para semana 2-3)
-# -----------------------------------------------------------------------------
+
 FASTAPI_URL = os.environ.get("FASTAPI_URL", "http://ai-engine:8001")
 
-# -----------------------------------------------------------------------------
-# Limites de subida
-# -----------------------------------------------------------------------------
-DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
-FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+
+
+from django.contrib.messages import constants as messages_constants
+
+MESSAGE_TAGS = {
+    messages_constants.DEBUG: "secondary",
+    messages_constants.INFO: "info",
+    messages_constants.SUCCESS: "success",
+    messages_constants.WARNING: "warning",
+    messages_constants.ERROR: "danger",
+}
