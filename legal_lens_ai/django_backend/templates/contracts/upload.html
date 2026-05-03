@@ -5,8 +5,12 @@
     <div class="col-md-7">
         <div class="card shadow-sm">
             <div class="card-body">
-                <h3 class="card-title mb-4">Subir nuevo contrato</h3>
-                <form method="post" enctype="multipart/form-data">
+                <h3 class="card-title mb-1">Subir nuevo contrato</h3>
+                <p class="text-muted small mb-4">
+                    El contrato se enviara al motor de IA para auditoria automatica.
+                    Puede tardar entre 2 y 10 segundos.
+                </p>
+                <form method="post" enctype="multipart/form-data" id="upload-form">
                     {% csrf_token %}
                     {% for field in form %}
                         <div class="mb-3">
@@ -15,7 +19,10 @@
                             {% if field.errors %}<div class="text-danger small">{{ field.errors|join:", " }}</div>{% endif %}
                         </div>
                     {% endfor %}
-                    <button type="submit" class="btn btn-primary">Subir y auditar</button>
+                    <button type="submit" class="btn btn-primary" id="submit-btn">
+                        <span class="btn-text">Subir y auditar</span>
+                        <span class="spinner-border spinner-border-sm ms-2 d-none" role="status" id="submit-spinner"></span>
+                    </button>
                     <a href="{% url 'contracts:dashboard' %}" class="btn btn-link">Cancelar</a>
                 </form>
             </div>
@@ -24,5 +31,11 @@
 </div>
 <script>
     document.querySelectorAll('input,select').forEach(el => el.classList.add('form-control'));
+    document.getElementById('upload-form').addEventListener('submit', function () {
+        const btn = document.getElementById('submit-btn');
+        btn.disabled = true;
+        btn.querySelector('.btn-text').textContent = 'Auditando con IA...';
+        document.getElementById('submit-spinner').classList.remove('d-none');
+    });
 </script>
 {% endblock %}
