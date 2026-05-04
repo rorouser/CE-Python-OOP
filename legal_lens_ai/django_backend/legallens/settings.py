@@ -16,6 +16,11 @@ ALLOWED_HOSTS = [
     if h.strip()
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+]
+
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -117,3 +122,6 @@ MESSAGE_TAGS = {
     messages_constants.WARNING: "warning",
     messages_constants.ERROR: "danger",
 }
+
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
